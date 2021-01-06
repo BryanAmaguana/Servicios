@@ -4,10 +4,10 @@ const uniqueValidator = require('mongoose-unique-validator');
 let Schema = mongoose.Schema;
 
 let PersonaSchema = new Schema({
-    cedular_persona: {
+    cedula_persona: {
         type: String,
         unique: true,
-        required: [true, "Nombre Obligatorio"]
+        required: [true, "Cedula Obligatorio"]
     },
 
     nombre_persona: {
@@ -17,7 +17,7 @@ let PersonaSchema = new Schema({
 
     apellido_persona: {
         type: String,
-        required: [true, "Nombre Obligatorio"]
+        required: [true, "Apellido Obligatorio"]
     },
 
     direccion_persona: {

@@ -21,6 +21,6 @@ let BusSchema = new Schema({
     },
 });
 
-PersonaSchema.plugin(uniqueValidator, { message: 'Numero de Bus ya registrado' });
+BusSchema.plugin(uniqueValidator, { message: 'Numero de Bus ya registrado' });
 
 module.exports = mongoose.model('Bus', BusSchema);

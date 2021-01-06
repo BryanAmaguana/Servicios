@@ -27,6 +27,6 @@ let PasajeroSchema = new Schema({
 
 });
 
-PersonaSchema.plugin(uniqueValidator, { message: 'Numero de cedula ya registrado' });
+PasajeroSchema.plugin(uniqueValidator, { message: 'Numero de cedula ya registrado' });
 
 module.exports = mongoose.model('Pasajero', PasajeroSchema);

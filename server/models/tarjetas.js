@@ -27,6 +27,6 @@ let TarjetaSchema = new Schema({
 
 });
 
-PersonaSchema.plugin(uniqueValidator, { message: 'Id de la tarjata ya registrado' });
+TarjetaSchema.plugin(uniqueValidator, { message: 'Id de la tarjata ya registrado' });
 
 module.exports = mongoose.model('Tarjeta', TarjetaSchema);

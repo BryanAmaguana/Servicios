@@ -5,29 +5,43 @@ const uniqueValidator = require('mongoose-unique-validator');
 let Schema = mongoose.Schema;
 
 let UsuarioSchema = new Schema({
-    Nombre_usuario: {
+    nombre_usuario: {
         type: String,
-        required: [true, "Nombre del rol Obligatorio"]
+        unique: true,
+        required: [true, "Nombre del usuario Obligatorio"]
     },
 
-    Contrasena: {
+    contrasena: {
         type: String,
         required: [true, "contrasena requerida"]
     },
 
+    correo: {
+        type: String,
+        required: [true, "correo requerida"]
+    },
+
     cedula_persona: {
         type: String,
-        unique: true,
         required: [true, "Id de la persona Obligatorio"]
     },
 
     fecha_registro_Usuario: {
         type: Date,
-        required: [true, "Fecha de registro obligatoria"]
+        required: false
     },
 
 });
 
-PersonaSchema.plugin(uniqueValidator, { message: 'Numero de cedula ya registrado' });
+UsuarioSchema.methods.toJSON = function() {
 
-module.exports = mongoose.model('Persona', PersonaSchema);
+    let user = this;
+    let userObject = user.toObject();
+    delete userObject.contrasena;
+
+    return userObject;
+}
+
+UsuarioSchema.plugin(uniqueValidator, { message: 'Nombre de usuario ya registrado' });
+
+module.exports = mongoose.model('Usuario', UsuarioSchema);
