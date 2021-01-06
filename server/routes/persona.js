@@ -44,8 +44,6 @@ app.get('/CantidadPersonas', function(req, res) {
         })
 });
 
-
-
 app.post('/persona', function(req, res) {
     let body = req.body;
     let persona = new Persona({
