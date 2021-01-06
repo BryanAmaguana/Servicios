@@ -5,13 +5,15 @@ let Schema = mongoose.Schema;
 
 let PasajeroSchema = new Schema({
     cedula_persona_pasajero: {
-        type: String,
+        type: Schema.ObjectId,
+        ref: 'Persona',
         unique: true,
         required: [true, "Id de la persona  Obligatorio"]
     },
 
     id_tarjeta_pasajero: {
-        type: String,
+        type: Schema.ObjectId,
+        ref: 'Tarjeta',
         required: [true, " Id de la tarjeta Obligatorio"]
     },
 

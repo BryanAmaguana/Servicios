@@ -22,8 +22,15 @@ let UsuarioSchema = new Schema({
     },
 
     cedula_persona: {
-        type: String,
+        type: Schema.ObjectId,
+        ref: 'Persona',
         required: [true, "Id de la persona Obligatorio"]
+    },
+
+    Rol_Usuario: {
+        type: Schema.ObjectId,
+        ref: 'Rol',
+        required: [true, "Rol Obligatorio"]
     },
 
     fecha_registro_Usuario: {

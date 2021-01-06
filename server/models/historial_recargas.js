@@ -20,13 +20,15 @@ let RecargadorSchema = new Schema({
     },
 
     id_tarjeta_recargada: {
-        type: String,
+        type: Schema.ObjectId,
+        ref: 'Tarjeta',
         required: false
     },
 
-    id_usuario: {
-        type: String,
-        required: [true, "Id  Obligatorio"]
+    Cedula_persona: {
+        type: Schema.ObjectId,
+        ref: 'Persona',
+        required: [true, "Cedula del usuario requerido"]
     },
 
 });

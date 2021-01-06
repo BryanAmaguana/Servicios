@@ -13,6 +13,11 @@ let Historial_adminSchema = new Schema({
         type: String,
         required: false
     },
+    Cedula_admin: {
+        type: Schema.ObjectId,
+        ref: 'Persona',
+        required: [true, "Cedula del Admin Requerido"]
+    },
 
     descripcion: {
         type: String,

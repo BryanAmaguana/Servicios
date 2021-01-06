@@ -13,16 +13,18 @@ app.use(bodyParser.urlencoded({ extended: false }));
 //
 app.use(bodyParser.json());
 
-app.use(require('./routes/persona'));
-app.use(require('./routes/usuario'));
+//configuracion global de rutas
+app.use(require('./routes/index'));
 
 
+//coneccion a mongo
 mongoose.connect(process.env.URLDB, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true }, (err, res) => {
     if (err) throw err;
 
     console.log('Base de datos conectada');
 });
 
+//puerto
 app.listen(process.env.PORT, () => {
     console.log('escuchando puerto: ', process.env.PORT);
 });

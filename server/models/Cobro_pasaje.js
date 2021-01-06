@@ -6,12 +6,14 @@ let Schema = mongoose.Schema;
 let Cobro_pasajeSchema = new Schema({
 
     id_pasajero: {
-        type: Number,
+        type: Schema.ObjectId,
+        ref: 'Pasajero',
         required: [true, "id del pasajero Obligatorio"]
     },
 
     Numero_bus_cobro: {
-        type: Number,
+        type: Schema.ObjectId,
+        ref: 'Bus',
         required: [true, "Numero del bus Obligatorio"]
     },
 

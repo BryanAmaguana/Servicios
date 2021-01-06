@@ -5,18 +5,15 @@ let Schema = mongoose.Schema;
 
 let RecorridoSchema = new Schema({
     numero_bus_recorrido: {
-        type: Number,
+        type: Schema.ObjectId,
+        ref: 'Bus',
         required: [true, "Numero del bus Obligatorio"]
     },
 
-    id_recorrido: {
-        type: String,
-        required: [true, "id del recorrido Obligatorio"]
-    },
-
-    apellido_persona: {
-        type: String,
-        required: [true, "Id de la ruta Obligatorio"]
+    id_Ruta_recorrido: {
+        type: Schema.ObjectId,
+        ref: 'Ruta',
+        required: [true, "id de la ruta Obligatorio"]
     },
 
     Fecha_inicio_recorrido: {

@@ -11,8 +11,10 @@ let BusSchema = new Schema({
     },
 
     cedula_dueno_bus: {
-        type: String,
-        required: [true, "Dueño Obligatorio"]
+        type: Schema.ObjectId,
+        ref: 'Persona',
+        required: [true, "Dueño Obligatorio"],
+
     },
 
     placa_bus: {

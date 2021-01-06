@@ -1,16 +1,10 @@
 const mongoose = require('mongoose');
-const uniqueValidator = require('mongoose-unique-validator');
 
 let Schema = mongoose.Schema;
 
 let RolSchema = new Schema({
-    id_rol: {
-        type: String,
-        unique: true,
-        required: [true, "id del rol Obligatorio"]
-    },
 
-    nombre_rol: {
+    nombre: {
         type: String,
         required: [true, "Nombre Obligatorio"]
     },

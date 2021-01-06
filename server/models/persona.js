@@ -27,7 +27,7 @@ let PersonaSchema = new Schema({
 
     celular_persona: {
         type: String,
-        required: [true, "Numero Celular Obligatorio"]
+        required: false
     },
 
     fecha_nacimiento_persona: {
