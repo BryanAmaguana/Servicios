@@ -3,7 +3,7 @@ const uniqueValidator = require('mongoose-unique-validator');
 
 let Schema = mongoose.Schema;
 
-let RecargadorSchema = new Schema({
+let RecargasSchema = new Schema({
     fecha_hora_Accion: {
         type: Date,
         required: [true, "Fecha hora Obligatorio"]
@@ -14,8 +14,8 @@ let RecargadorSchema = new Schema({
         required: [true, "Accion Obligatoria"]
     },
 
-    Valor_recarga: {
-        type: String,
+    valor_recarga: {
+        type: Number,
         required: false
     },
 
@@ -25,13 +25,13 @@ let RecargadorSchema = new Schema({
         required: false
     },
 
-    Cedula_persona: {
+    id_usuario: {
         type: Schema.ObjectId,
-        ref: 'Persona',
-        required: [true, "Cedula del usuario requerido"]
+        ref: 'Usuario',
+        required: [true, "id del usuario requerido"]
     },
 
 });
 
 
-module.exports = mongoose.model('Recargador', RecargadorSchema);
+module.exports = mongoose.model('Recargas', RecargasSchema);

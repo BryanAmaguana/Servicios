@@ -33,6 +33,11 @@ let PersonaSchema = new Schema({
     fecha_nacimiento_persona: {
         type: Date,
         required: [true, "Fecha de Nacimiento Obligatorio"]
+    },
+
+    disponible: {
+        type: Boolean,
+        required: [true, "Disponibilidad Obligatorio"]
     }
 });
 

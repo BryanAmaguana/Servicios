@@ -1,13 +1,14 @@
 const express = require('express');
 const { verificaToken } = require('../middlewares/autenticacion');
-const Rol = require('../models/rol');
-
+const Tarjeta = require('../models/tarjeta');
 const app = express();
 
-/* Obtener lista de rol */
-app.get('/ObtenerRol', verificaToken, function(req, res) {
 
-    Rol.find({ disponible: true }).exec((err, rol) => {
+/* Listar todas las tarjetas */
+
+app.get('/ObtenerTarjetas', verificaToken, function(req, res) {
+
+    Tarjeta.find({ disponible: true }).exec((err, tarjeta) => {
         if (err) {
             return res.status(400).json({
                 ok: false,
@@ -16,17 +17,18 @@ app.get('/ObtenerRol', verificaToken, function(req, res) {
         }
         res.json({
             ok: true,
-            rol,
+            tarjeta,
         });
     });
 });
 
-/* Obtener rol por el nombre */
 
-app.get('/BuscarRolNombre/:nombre', verificaToken, (req, res) => {
-    let nombre = req.params.nombre;
+/* Listado de tarjeta por codigo */
 
-    Rol.find({ disponible: true }, { nombre: nombre }).exec((err, rol) => {
+app.get('/BuscarTarjetaCodigo/:codigo', verificaToken, (req, res) => {
+    let codigo = req.params.codigo;
+
+    Tarjeta.find({ disponible: true }, { codigo: codigo }).exec((err, tarjeta) => {
         if (err) {
             return res.status(500).json({
                 ok: false,
@@ -34,26 +36,27 @@ app.get('/BuscarRolNombre/:nombre', verificaToken, (req, res) => {
             });
         }
 
-        if (!rol) {
+        if (!tarjeta) {
             return res.status(500).json({
                 ok: false,
                 err: {
-                    message: 'Rol no encontrado'
+                    message: 'Tarjeta no encontrado'
                 }
             });
         }
         res.json({
             ok: true,
-            rol
+            tarjeta
         });
     });
 });
 
-/* Obtener cantidad de roles */
-app.get('/CantidadRol', verificaToken, function(req, res) {
+/* Obtener la cantidad de tarjetas registradas */
 
-    Rol.find({ disponible: true })
-        .exec((err, rol) => {
+app.get('/CantidadTarjetas', verificaToken, function(req, res) {
+
+    Tarjeta.find({ disponible: true })
+        .exec((err, tarjeta) => {
             if (err) {
                 return res.status(400).json({
                     ok: false,
@@ -61,7 +64,7 @@ app.get('/CantidadRol', verificaToken, function(req, res) {
                 });
             }
             //aqui va las condiciones para que cuente
-            Rol.count({}, (err, conteo) => {
+            Tarjeta.count({}, (err, conteo) => {
                 res.json({
                     ok: true,
                     cuantos: conteo
@@ -70,18 +73,19 @@ app.get('/CantidadRol', verificaToken, function(req, res) {
         });
 });
 
-/* Agregar un rol */
+/* Agregar una nueva tarjeta */
 
-app.post('/AgregarRol', verificaToken, function(req, res) {
+app.post('/AgregarTarjeta', verificaToken, function(req, res) {
     let body = req.body;
-    let rol = new Rol({
-        nombre: body.nombre,
-        descripcion: body.descripcion,
-        disponible: body.disponible
-    });
+    let tarjeta = new Tarjeta({
+        codigo: body.codigo,
+        valor_tarjeta: body.valor_tarjeta,
+        tipo: body.tipo,
+        disponible: body.disponible,
+        descripcion: body.descripcion
+    })
 
-    rol.save((err, rolDB) => {
-
+    tarjeta.save((err, TarjetaDB) => {
         if (err) {
             return res.status(400).json({
                 ok: false,
@@ -90,19 +94,20 @@ app.post('/AgregarRol', verificaToken, function(req, res) {
         }
         res.json({
             ok: true,
-            rol: rolDB
+            tarjeta: TarjetaDB
         });
     });
 });
 
-/* Actualizar un rol */
 
-app.put('ActualizarRol/:id', verificaToken, (req, res) => {
+
+/* Actualizar una tarjeta */
+
+app.put('ActualizarTarjeta/:id', verificaToken, (req, res) => {
     let id = req.params.id;
     let body = req.body;
 
-    Rol.findById(id, (err, RolDB) => {
-
+    Tarjeta.findById(id, (err, tarjetaDB) => {
         if (err) {
             return res.status(500).json({
                 ok: false,
@@ -110,7 +115,7 @@ app.put('ActualizarRol/:id', verificaToken, (req, res) => {
             });
         }
 
-        if (!RolDB) {
+        if (!tarjetaDB) {
             return res.status(400).json({
                 ok: false,
                 err: {
@@ -118,35 +123,36 @@ app.put('ActualizarRol/:id', verificaToken, (req, res) => {
                 }
             });
         }
+        tarjetaDB.codigo = body.codigo;
+        tarjetaDB.valor_tarjeta = body.valor_tarjeta;
+        tarjetaDB.tipo = body.tipo;
+        tarjetaDB.disponible = body.disponible;
+        tarjetaDB.descripcion = body.descripcion;
 
-        RolDB.nombre = body.nombre;
-        RolDB.descripcion = body.descripcion;
-        RolDB.disponible = body.disponible;
-
-        RolDB.save((err, RolActualizado) => {
+        tarjetaDB.save((err, tarjetaActualizada) => {
             if (err) {
                 return res.status(500).json({
                     ok: false,
                     err
                 });
             }
+
             res.json({
                 ok: true,
-                rol: RolActualizado
+                tarjeta: tarjetaActualizada
             });
         });
     });
 });
 
 
+/* Eliminar una tarjeta */
 
-
-/* Eliminar un rol */
-app.delete('/BorrarRol/:id', verificaToken, (req, res) => {
+app.delete('/BorrarTarjeta/:id', verificaToken, (req, res) => {
 
     let id = req.params.id;
 
-    Rol.findById(id, (err, RolDB) => {
+    Tarjeta.findById(id, (err, TarjetaDB) => {
         if (err) {
             return res.status(500).json({
                 ok: false,
@@ -154,7 +160,7 @@ app.delete('/BorrarRol/:id', verificaToken, (req, res) => {
             });
         }
 
-        if (!RolDB) {
+        if (!TarjetaDB) {
             return res.status(400).json({
                 ok: false,
                 err: {
@@ -163,9 +169,9 @@ app.delete('/BorrarRol/:id', verificaToken, (req, res) => {
             });
         }
 
-        RolDB.disponible = false;
+        TarjetaDB.disponible = false;
 
-        RolDB.save((err, RolBorrado) => {
+        TarjetaDB.save((err, TarjetaBorrada) => {
             if (err) {
                 return res.status(500).json({
                     ok: false,
@@ -175,13 +181,12 @@ app.delete('/BorrarRol/:id', verificaToken, (req, res) => {
 
             res.json({
                 ok: true,
-                rol: RolBorrado,
-                message: 'Rol Borrada'
+                tarjeta: TarjetaBorrada,
+                message: 'Tarjeta Borrada'
             });
+
         });
     });
 });
-
-
 
 module.exports = app;

@@ -11,10 +11,10 @@ let Cobro_pasajeSchema = new Schema({
         required: [true, "id del pasajero Obligatorio"]
     },
 
-    Numero_bus_cobro: {
+    id_bus_cobro: {
         type: Schema.ObjectId,
         ref: 'Bus',
-        required: [true, "Numero del bus Obligatorio"]
+        required: [true, "id bus Obligatorio"]
     },
 
     fecha_hora_cobro: {
@@ -22,7 +22,10 @@ let Cobro_pasajeSchema = new Schema({
         required: [true, "fecha de cobro Obligatorio"]
     },
 
-
+    valor_pagado: {
+        type: Number,
+        require: [true, 'Valor Obligatorio']
+    }
 });
 
-module.exports = mongoose.model('Cobro_Pasaje', Cobro_pasajeSchema);
+module.exports = mongoose.model('cobro_pasaje', Cobro_pasajeSchema);

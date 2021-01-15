@@ -9,9 +9,14 @@ let RutaSchema = new Schema({
         required: [true, "Nombre de la ruta Obligatoria"]
     },
 
-    Descripcion: {
+    descripcion: {
         type: String,
         required: false
+    },
+
+    disponible: {
+        type: Boolean,
+        required: [true, "Disponiblilidad Obligatoria"]
     },
 
 });

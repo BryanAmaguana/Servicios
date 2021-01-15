@@ -4,7 +4,7 @@ const uniqueValidator = require('mongoose-unique-validator');
 let Schema = mongoose.Schema;
 
 let PasajeroSchema = new Schema({
-    cedula_persona_pasajero: {
+    cedula_pasajero: {
         type: Schema.ObjectId,
         ref: 'Persona',
         unique: true,
@@ -22,11 +22,16 @@ let PasajeroSchema = new Schema({
         required: [true, " Valor del pasaje obligatorio"]
     },
 
-    pasaje_especial_pasajero: {
-        type: String,
-        required: [true, "Pasaje especial obligatorio"]
+    tipo_pasaje_pasajero: {
+        type: Schema.ObjectId,
+        ref: 'Tipo_pasajero',
+        required: [true, "Tipo de pasajero obligatorio"]
     },
 
+    disponible: {
+        type: Boolean,
+        required: [true, "Disponibilidad Obligatorio"]
+    }
 });
 
 PasajeroSchema.plugin(uniqueValidator, { message: 'Numero de cedula ya registrado' });

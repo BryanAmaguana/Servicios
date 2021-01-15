@@ -44,8 +44,8 @@ app.post('/login', (req, res) => {
             ok: true,
             usuario: usuarioDB,
             token
-        })
-    })
+        });
+    });
 });
 
 module.exports = app;

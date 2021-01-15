@@ -10,10 +10,10 @@ let BusSchema = new Schema({
         required: [true, "Numero Obligatorio"]
     },
 
-    cedula_dueno_bus: {
+    id_dueno_bus: {
         type: Schema.ObjectId,
         ref: 'Persona',
-        required: [true, "Dueño Obligatorio"],
+        required: [true, "Dueño Obligatorio"]
 
     },
 
@@ -21,6 +21,12 @@ let BusSchema = new Schema({
         type: String,
         required: false
     },
+
+    disponible: {
+        type: Boolean,
+        required: [true, "Disponibilidad Obligatorio"]
+    },
+
 });
 
 BusSchema.plugin(uniqueValidator, { message: 'Numero de Bus ya registrado' });

@@ -21,13 +21,13 @@ let UsuarioSchema = new Schema({
         required: [true, "correo requerida"]
     },
 
-    cedula_persona: {
+    id_persona: {
         type: Schema.ObjectId,
         ref: 'Persona',
         required: [true, "Id de la persona Obligatorio"]
     },
 
-    Rol_Usuario: {
+    rol_Usuario: {
         type: Schema.ObjectId,
         ref: 'Rol',
         required: [true, "Rol Obligatorio"]
@@ -37,6 +37,11 @@ let UsuarioSchema = new Schema({
         type: Date,
         required: false
     },
+
+    disponible: {
+        type: Boolean,
+        required: [true, "Disponibilidad Obligatorio"]
+    }
 
 });
 

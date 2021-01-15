@@ -4,23 +4,29 @@ const uniqueValidator = require('mongoose-unique-validator');
 let Schema = mongoose.Schema;
 
 let TarjetaSchema = new Schema({
-    id_tarjeta: {
+
+    codigo: {
         type: String,
-        unique: true,
-        required: [true, "Id de la tarjeta Obligatorio"]
+        required: [true, "Codigo Obligatorio"]
     },
 
-    Valor_tarjeta: {
-        type: double,
+    valor_tarjeta: {
+        type: Number,
         required: [true, "Valor Obligatorio"]
     },
 
-    Activo: {
+    tipo: {
         type: String,
         required: [true, "Disponibilidad Obligatorio"]
     },
 
-    Descripcion: {
+
+    disponible: {
+        type: Boolean,
+        required: [true, "Disponibilidad Obligatorio"]
+    },
+
+    descripcion: {
         type: String,
         required: false
     },

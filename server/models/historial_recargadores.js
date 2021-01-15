@@ -3,13 +3,13 @@ const uniqueValidator = require('mongoose-unique-validator');
 
 let Schema = mongoose.Schema;
 
-let Historial_adminSchema = new Schema({
+let Historial_RecargadoresSchema = new Schema({
     fecha_accion: {
         type: Date,
         required: [true, "Fecha requerida"]
     },
 
-    accion_admin: {
+    accion_recargador: {
         type: String,
         required: false
     },
@@ -27,4 +27,4 @@ let Historial_adminSchema = new Schema({
 });
 
 
-module.exports = mongoose.model('Historial_admin', Historial_adminSchema);
+module.exports = mongoose.model('Historial_Recargadores', Historial_RecargadoresSchema);

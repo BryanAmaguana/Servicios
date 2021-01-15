@@ -1,12 +1,16 @@
 const mongoose = require('mongoose');
-
 let Schema = mongoose.Schema;
 
-let RolSchema = new Schema({
+let TipoSchema = new Schema({
 
     nombre: {
         type: String,
         required: [true, "Nombre Obligatorio"]
+    },
+
+    valor: {
+        type: Number,
+        required: [true, "Valor Obligatorio"]
     },
 
     descripcion: {
@@ -16,8 +20,9 @@ let RolSchema = new Schema({
 
     disponible: {
         type: Boolean,
-        required: [true, "Disponibilidad Obligatoria"]
+        required: [true, "Disponibilidad Obligatorio"]
     }
+
 });
 
-module.exports = mongoose.model('Rol', RolSchema);
+module.exports = mongoose.model('Tipo_pasajero', TipoSchema);

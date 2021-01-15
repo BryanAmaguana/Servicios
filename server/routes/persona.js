@@ -1,14 +1,13 @@
 const express = require('express');
 const Persona = require('../models/persona');
-
-
+const { verificaToken } = require('../middlewares/autenticacion');
 const app = express();
 
-app.get('/persona', function(req, res) {
+/* Obtener Listado todas las personas */
 
-    Persona.find({}) //aqui se pone los campos que deseo
-        //       .skip(5)
-        //       .limit(5)
+app.get('/ObtenerPersona', verificaToken, function(req, res) {
+
+    Persona.find({ disponible: true })
         .exec((err, persona) => {
             if (err) {
                 return res.status(400).json({
@@ -20,13 +19,15 @@ app.get('/persona', function(req, res) {
                 ok: true,
                 persona,
             });
-        })
+        });
 });
 
 
-app.get('/CantidadPersonas', function(req, res) {
+/* Obtener la cantidad de personas registradas */
 
-    Persona.find({})
+app.get('/CantidadPersonas', verificaToken, function(req, res) {
+
+    Persona.find({ disponible: true })
         .exec((err, persona) => {
             if (err) {
                 return res.status(400).json({
@@ -41,10 +42,34 @@ app.get('/CantidadPersonas', function(req, res) {
                     cuantos: conteo
                 });
             });
-        })
+        });
 });
 
-app.post('/persona', function(req, res) {
+/* Obtener una persona por la cedula */
+
+app.get('/BuscarPersonaCedula/:cedula', verificaToken, (req, res) => {
+    let cedula = req.params.cedula;
+
+    Persona.find({ cedula_persona: cedula }).exec((err, persona) => {
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                err
+            });
+        }
+
+        res.json({
+            ok: true,
+            persona
+        });
+    });
+
+});
+
+
+/* Agregar una persona */
+
+app.post('/AgregarPersona', verificaToken, function(req, res) {
     let body = req.body;
     let persona = new Persona({
         cedula_persona: body.cedula,
@@ -52,7 +77,8 @@ app.post('/persona', function(req, res) {
         apellido_persona: body.apellido,
         direccion_persona: body.direccion,
         celular_persona: body.celular,
-        fecha_nacimiento_persona: body.fecha_Nacimiento
+        fecha_nacimiento_persona: body.fecha_Nacimiento,
+        disponible: body.disponible
     })
 
     persona.save((err, personaDB) => {
@@ -66,14 +92,107 @@ app.post('/persona', function(req, res) {
         res.json({
             ok: true,
             persona: personaDB
-        })
+        });
     });
 
 });
 
 
+/* Actualizar una persona */
+
+app.put('ActualizarPersona/:id', verificaToken, (req, res) => {
+    let id = req.params.id;
+    let body = req.body;
+
+    Persona.findById(id, (err, personaDB) => {
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                err
+            });
+        }
+
+        if (!personaDB) {
+            return res.status(400).json({
+                ok: false,
+                err: {
+                    message: 'El Id no existe'
+                }
+            });
+        }
+
+        personaDB.cedula_persona = body.cedula;
+        personaDB.nombre_persona = body.nombre;
+        personaDB.apellido_persona = body.apellido;
+        personaDB.direccion_persona = body.direccion;
+        personaDB.celular_persona = body.celular;
+        personaDB.fecha_nacimiento_persona = body.fecha_Nacimiento;
+        personaDB.disponible = body.disponible;
+
+        personaDB.save((err, personaActualizada) => {
+
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    err
+                });
+            }
+
+            res.json({
+                ok: true,
+                persona: personaActualizada
+            });
+        });
+    });
+
+});
+
+
+/* Borrar una persona */
+
+app.delete('/BorrarPersona/:id', verificaToken, (req, res) => {
+
+    let id = req.params.id;
+    Persona.findById(id, (err, PersonaDB) => {
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                err
+            });
+        }
+
+        if (!PersonaDB) {
+            return res.status(400).json({
+                ok: false,
+                err: {
+                    message: 'El Id no existe'
+                }
+            });
+        }
+
+        PersonaDB.disponible = false;
+
+        PersonaDB.save((err, PersonaBorrada) => {
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    err
+                });
+            }
+
+            res.json({
+                ok: true,
+                persona: PersonaDB,
+                message: 'Persona Borrada'
+            });
+
+        });
+    });
+});
+
+
 //borrar definitivamente
-app.delete('/persona/:id', function(req, res) {
+app.delete('/BorrarDefinitivamentePersona/:id', verificaToken, function(req, res) {
 
     let id = req.params.id;
 
@@ -100,12 +219,5 @@ app.delete('/persona/:id', function(req, res) {
         });
     });
 });
-
-
-
-//cambiar el estado de la persona
-
-
-
 
 module.exports = app;

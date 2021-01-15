@@ -1,13 +1,14 @@
 const express = require('express');
 const { verificaToken } = require('../middlewares/autenticacion');
-const Rol = require('../models/rol');
-
+const Ruta = require('../models/ruta');
 const app = express();
 
-/* Obtener lista de rol */
-app.get('/ObtenerRol', verificaToken, function(req, res) {
 
-    Rol.find({ disponible: true }).exec((err, rol) => {
+/* Obtener todas las rutas */
+
+app.get('/ObtenerRuta', verificaToken, function(req, res) {
+
+    Ruta.find({ disponible: true }).exec((err, ruta) => {
         if (err) {
             return res.status(400).json({
                 ok: false,
@@ -16,17 +17,17 @@ app.get('/ObtenerRol', verificaToken, function(req, res) {
         }
         res.json({
             ok: true,
-            rol,
+            ruta,
         });
     });
 });
 
-/* Obtener rol por el nombre */
+/* Obtener la ruta por el nombre */
 
-app.get('/BuscarRolNombre/:nombre', verificaToken, (req, res) => {
+app.get('/BuscarRutaNombre/:nombre', verificaToken, (req, res) => {
     let nombre = req.params.nombre;
 
-    Rol.find({ disponible: true }, { nombre: nombre }).exec((err, rol) => {
+    Ruta.find({ disponible: true }, { nombre_ruta: nombre }).exec((err, ruta) => {
         if (err) {
             return res.status(500).json({
                 ok: false,
@@ -34,26 +35,28 @@ app.get('/BuscarRolNombre/:nombre', verificaToken, (req, res) => {
             });
         }
 
-        if (!rol) {
+        if (!ruta) {
             return res.status(500).json({
                 ok: false,
                 err: {
-                    message: 'Rol no encontrado'
+                    message: 'Ruta no encontrado'
                 }
             });
         }
         res.json({
             ok: true,
-            rol
+            ruta
         });
     });
 });
 
-/* Obtener cantidad de roles */
-app.get('/CantidadRol', verificaToken, function(req, res) {
 
-    Rol.find({ disponible: true })
-        .exec((err, rol) => {
+/* Obtener la cantidad de rutas */
+
+app.get('/CantidadRutas', verificaToken, function(req, res) {
+
+    Ruta.find({ disponible: true })
+        .exec((err, ruta) => {
             if (err) {
                 return res.status(400).json({
                     ok: false,
@@ -61,7 +64,7 @@ app.get('/CantidadRol', verificaToken, function(req, res) {
                 });
             }
             //aqui va las condiciones para que cuente
-            Rol.count({}, (err, conteo) => {
+            Ruta.count({}, (err, conteo) => {
                 res.json({
                     ok: true,
                     cuantos: conteo
@@ -70,18 +73,17 @@ app.get('/CantidadRol', verificaToken, function(req, res) {
         });
 });
 
-/* Agregar un rol */
+/* Agregar una ruta */
 
-app.post('/AgregarRol', verificaToken, function(req, res) {
+app.post('/AgregarRuta', verificaToken, function(req, res) {
     let body = req.body;
-    let rol = new Rol({
-        nombre: body.nombre,
+    let ruta = new Ruta({
+        nombre_ruta: body.nombre,
         descripcion: body.descripcion,
-        disponible: body.disponible
+        disponible: doby.disponible
     });
 
-    rol.save((err, rolDB) => {
-
+    ruta.save((err, RutaDB) => {
         if (err) {
             return res.status(400).json({
                 ok: false,
@@ -90,27 +92,25 @@ app.post('/AgregarRol', verificaToken, function(req, res) {
         }
         res.json({
             ok: true,
-            rol: rolDB
+            ruta: RutaDB
         });
     });
 });
 
-/* Actualizar un rol */
+/* Actualizar una ruta */
 
-app.put('ActualizarRol/:id', verificaToken, (req, res) => {
+app.put('ActualizarRuta/:id', verificaToken, (req, res) => {
     let id = req.params.id;
     let body = req.body;
 
-    Rol.findById(id, (err, RolDB) => {
-
+    Ruta.findById(id, (res, RutaDB) => {
         if (err) {
             return res.status(500).json({
                 ok: false,
                 err
             });
         }
-
-        if (!RolDB) {
+        if (!RutaDB) {
             return res.status(400).json({
                 ok: false,
                 err: {
@@ -119,34 +119,33 @@ app.put('ActualizarRol/:id', verificaToken, (req, res) => {
             });
         }
 
-        RolDB.nombre = body.nombre;
-        RolDB.descripcion = body.descripcion;
-        RolDB.disponible = body.disponible;
+        RutaDB.nombre_ruta = body.nombre;
+        RutaDB.descripcion = body.descripcion;
+        RutaDB.disponible = docy.disponible;
 
-        RolDB.save((err, RolActualizado) => {
+        RutaDB.save((err, RutaActualizada) => {
             if (err) {
                 return res.status(500).json({
                     ok: false,
                     err
                 });
             }
+
             res.json({
                 ok: true,
-                rol: RolActualizado
+                ruta: RutaActualizada
             });
         });
     });
 });
 
 
+/* Eliminar una ruta */
 
-
-/* Eliminar un rol */
-app.delete('/BorrarRol/:id', verificaToken, (req, res) => {
-
+app.delete('BorrarRuta/:id', verificaToken, (req, res) => {
     let id = req.params.id;
 
-    Rol.findById(id, (err, RolDB) => {
+    Ruta.findById(id, (err, RutaDB) => {
         if (err) {
             return res.status(500).json({
                 ok: false,
@@ -154,7 +153,7 @@ app.delete('/BorrarRol/:id', verificaToken, (req, res) => {
             });
         }
 
-        if (!RolDB) {
+        if (!RutaDB) {
             return res.status(400).json({
                 ok: false,
                 err: {
@@ -163,9 +162,9 @@ app.delete('/BorrarRol/:id', verificaToken, (req, res) => {
             });
         }
 
-        RolDB.disponible = false;
+        RutaDB.disponible = false;
 
-        RolDB.save((err, RolBorrado) => {
+        RutaDB.save((err, RutaBorrada) => {
             if (err) {
                 return res.status(500).json({
                     ok: false,
@@ -175,13 +174,13 @@ app.delete('/BorrarRol/:id', verificaToken, (req, res) => {
 
             res.json({
                 ok: true,
-                rol: RolBorrado,
-                message: 'Rol Borrada'
+                ruta: RutaBorrada,
+                message: 'Ruta Borrada'
             });
+
         });
     });
 });
-
 
 
 module.exports = app;
