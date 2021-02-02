@@ -12,9 +12,11 @@ app.get('/ObtenerListadoBus', verificaToken, function(req, res) {
     Bus.find({ disponible: true })
         .exec((err, bus) => {
             if (err) {
-                return res.status(400).json({
+                return res.status(500).json({
                     ok: false,
-                    err
+                    err:{
+                        message: 'No hay buses'
+                    }
                 });
             }
             res.json({

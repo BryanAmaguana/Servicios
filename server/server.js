@@ -16,7 +16,6 @@ app.use(bodyParser.json());
 //configuracion global de rutas
 app.use(require('./routes/index'));
 
-
 //coneccion a mongo
 mongoose.connect(process.env.URLDB, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true }, (err, res) => {
     if (err) throw err;

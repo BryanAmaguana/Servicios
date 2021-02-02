@@ -1,14 +1,46 @@
 const express = require('express');
-
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-
 const Usuario = require('../models/usuario');
-
 const app = express();
+const jwt = require('../middlewares/jwt');
 
 
-app.post('/login', (req, res) => {
+app.post('/login',  (req, res) =>  {
+    const params = req.body;
+    const nombre_usuario = params.nombre_usuario;
+    const contrasena = params.contrasena;
+  
+    Usuario.findOne({nombre_usuario}, (err, userStored) => {
+      if (err) {
+        res.status(500).send({ message: "Error del servidor." });;
+      } else {
+        if (!userStored) {
+          res.status(404).send( { message: "Usuario no encontrado." });
+        } else {
+          bcrypt.compare(contrasena, userStored.contrasena, (err, check) => {
+            if (err) {
+              res.status(500).send({ message: "Error del servidor." });
+            } else if (!check) {
+              res.status(404).send({ message: "La contraseña es incorrecta." });
+            } else {
+              if (!userStored.disponible) {
+                res
+                  .status(200)
+                  .send({ code: 200, message: "El usuario no se ha activado." });
+              } else {
+                res.status(200).send({
+                  accessToken: jwt.createAccessToken(userStored),
+                  refreshToken: jwt.createRefreshToken(userStored)
+                });
+              }
+            }
+          });
+        }
+      }
+    });
+  });
+
+/* app.post('/login', (req, res) => {
 
     let body = req.body;
     Usuario.findOne({ email: body.email }, (err, usuarioDB) => {
@@ -46,6 +78,6 @@ app.post('/login', (req, res) => {
             token
         });
     });
-});
+}); */
 
 module.exports = app;

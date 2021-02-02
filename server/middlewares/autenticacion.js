@@ -1,24 +1,33 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jwt-simple");
+const moment = require("moment");
 
 
 // verificar token
 
-let verificaToken = (req, res, next) => {
-    let token = req.get('token');
-    jwt.verify(token, process.env.SEED, (err, decoded) => {
+const SECRET_KEY = "gR7cH9Svfj8JLe4UNIONGhs48hheb3902nh5DsA";
 
-        if (err) {
-            return res.status(401).json({
-                ok: false,
-                err: {
-                    message: 'token no valido'
-                }
-            });
-        }
-        req.usuario = decoded.usuario;
-        next();
-    });
-};
+let verificaToken  = (req, res, next) => {
+    if (!req.headers.authorization) {
+      return res
+        .status(403)
+        .send({ message: "La peticion no tiene la cabecera de Autenticacion." });
+    }
+  
+    const token = req.headers.authorization.replace(/['"]+/g, "");
+  
+    try {
+      var payload = jwt.decode(token, SECRET_KEY);
+  
+      if (payload.exp <= moment().unix()) {
+        return res.status(404).send({ message: "El token ha expirado." });
+      }
+    } catch (ex) {
+      console.log(ex);
+      return res.status(404).send({ message: "Token invalido." });
+    }
+    req.user = payload;
+    next();
+  };
 
 
 let verificarRol = (req, res, next) => {
@@ -36,11 +45,11 @@ let verificarRol = (req, res, next) => {
         });
     }
 
-}
+};
 
 
 
 module.exports = {
-    verificaToken,
-    verificarRol
+    verificarRol,
+    verificaToken
 }

@@ -41,7 +41,9 @@ let UsuarioSchema = new Schema({
     disponible: {
         type: Boolean,
         required: [true, "Disponibilidad Obligatorio"]
-    }
+    },
+    
+    avatar: String
 
 });
 
