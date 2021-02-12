@@ -7,7 +7,7 @@ const app = express();
 /* Obtener lista de rol */
 app.get('/ObtenerRol', verificaToken, function(req, res) {
 
-    Rol.find({ disponible: true }).exec((err, rol) => {
+    Rol.find().exec((err, rol) => {
         if (err) {
             return res.status(400).json({
                 ok: false,
@@ -26,7 +26,7 @@ app.get('/ObtenerRol', verificaToken, function(req, res) {
 app.get('/BuscarRolNombre/:nombre', verificaToken, (req, res) => {
     let nombre = req.params.nombre;
 
-    Rol.find({ disponible: true }, { nombre: nombre }).exec((err, rol) => {
+    Rol.find({ nombre: nombre }).exec((err, rol) => {
         if (err) {
             return res.status(500).json({
                 ok: false,
@@ -48,6 +48,35 @@ app.get('/BuscarRolNombre/:nombre', verificaToken, (req, res) => {
         });
     });
 });
+
+/* Obtener rol por el id */
+
+app.get('/BuscarRolId/:id', verificaToken, (req, res) => {
+    let id = req.params.id;
+
+    Rol.find({ _id: id }).exec((err, rol) => {
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                err
+            });
+        }
+
+        if (!rol) {
+            return res.status(500).json({
+                ok: false,
+                err: {
+                    message: 'Rol no encontrado'
+                }
+            });
+        }
+        res.json({
+            ok: true,
+            rol
+        });
+    });
+});
+
 
 /* Obtener cantidad de roles */
 app.get('/CantidadRol', verificaToken, function(req, res) {

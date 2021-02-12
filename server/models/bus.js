@@ -10,7 +10,7 @@ let BusSchema = new Schema({
         required: [true, "Numero Obligatorio"]
     },
 
-    id_dueno_bus: {
+    id_persona: {
         type: Schema.ObjectId,
         ref: 'Persona',
         required: [true, "Dueño Obligatorio"]

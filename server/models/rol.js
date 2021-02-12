@@ -12,11 +12,6 @@ let RolSchema = new Schema({
     descripcion: {
         type: String,
         required: false
-    },
-
-    disponible: {
-        type: Boolean,
-        required: [true, "Disponibilidad Obligatoria"]
     }
 });
 

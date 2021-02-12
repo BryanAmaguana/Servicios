@@ -32,8 +32,8 @@ let verificaToken  = (req, res, next) => {
 
 let verificarRol = (req, res, next) => {
     let usuario = req.usuario;
-
-    if (usuario.rol === 'administrador') {
+    console.log(usuario.id_rol);
+    if (usuario.id_rol == '5ff62a2d9e8b3e14d287f16c') {
         next();
 
     } else {

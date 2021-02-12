@@ -67,6 +67,26 @@ app.get('/BuscarPersonaCedula/:cedula', verificaToken, (req, res) => {
 });
 
 
+/* Obtener una persona por id */
+
+app.get('/BuscarPersonaId/:id',verificaToken, (req, res) => {
+    
+    let id = req.params.id;
+    Persona.find({ _id: id }).exec((err, persona) => {
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                err
+            });
+        }
+        res.json({
+            persona
+        });
+    });
+
+});
+
+
 /* Agregar una persona */
 
 app.post('/AgregarPersona', verificaToken, function(req, res) {

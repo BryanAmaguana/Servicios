@@ -9,8 +9,7 @@ const app = express();
 
 app.get('/ObtenerListadoBus', verificaToken, function(req, res) {
 
-    Bus.find({ disponible: true })
-        .exec((err, bus) => {
+    Bus.find({ disponible: true }).populate('id_persona').exec((err, bus) => {
             if (err) {
                 return res.status(500).json({
                     ok: false,
@@ -33,7 +32,7 @@ app.get('/BuscarBusNumero/:numero_bus', verificaToken, (req, res) => {
 
     let numero_bus = req.params.numero_bus;
 
-    Bus.find({ disponible: true }, { numero_bus: numero_bus }).populate('id_dueno_bus').exec((err, bus) => {
+    Bus.find({ disponible: true }, { numero_bus: numero_bus }).populate('id_persona').exec((err, bus) => {
         if (err) {
             return res.status(500).json({
                 ok: false,
@@ -64,9 +63,9 @@ app.get('/BuscarBusNumero/:numero_bus', verificaToken, (req, res) => {
 app.post('/InsertarBus', verificaToken, function(req, res) {
     let body = req.body;
     let bus = new Bus({
-        numero_bus: body.numero,
-        id_dueno_bus: body.id_dueno,
-        placa_bus: body.placa,
+        numero_bus: body.numero_bus,
+        id_persona: body.id_persona,
+        placa_bus: body.placa_bus,
         disponible: body.disponible
     })
 

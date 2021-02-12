@@ -24,10 +24,10 @@ let UsuarioSchema = new Schema({
     id_persona: {
         type: Schema.ObjectId,
         ref: 'Persona',
-        required: [true, "Id de la persona Obligatorio"]
+        required: [true, "id obligatorio"]
     },
 
-    rol_Usuario: {
+    id_rol: {
         type: Schema.ObjectId,
         ref: 'Rol',
         required: [true, "Rol Obligatorio"]
@@ -43,7 +43,10 @@ let UsuarioSchema = new Schema({
         required: [true, "Disponibilidad Obligatorio"]
     },
     
-    avatar: String
+    avatar: {
+        type: String,
+        required: false
+    }
 
 });
 
