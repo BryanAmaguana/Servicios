@@ -34,7 +34,7 @@ let UsuarioSchema = new Schema({
     },
 
     fecha_registro_Usuario: {
-        type: Date,
+        type: String,
         required: false
     },
 

@@ -1,13 +1,13 @@
 const express = require('express');
-const { verificaToken } = require('../middlewares/autenticacion');
+const { verificaToken, verificarRol } = require('../middlewares/autenticacion');
 const Rol = require('../models/rol');
 
 const app = express();
 
 /* Obtener lista de rol */
-app.get('/ObtenerRol', verificaToken, function(req, res) {
+app.get('/ObtenerRol', verificaToken, function (req, res) {
 
-    Rol.find().exec((err, rol) => {
+    Rol.find({}).sort({ nombre: 1 }).exec((err, rol) => {
         if (err) {
             return res.status(400).json({
                 ok: false,
@@ -77,9 +77,8 @@ app.get('/BuscarRolId/:id', verificaToken, (req, res) => {
     });
 });
 
-
 /* Obtener cantidad de roles */
-app.get('/CantidadRol', verificaToken, function(req, res) {
+app.get('/CantidadRol', verificaToken, function (req, res) {
 
     Rol.find({ disponible: true })
         .exec((err, rol) => {
@@ -101,116 +100,65 @@ app.get('/CantidadRol', verificaToken, function(req, res) {
 
 /* Agregar un rol */
 
-app.post('/AgregarRol', verificaToken, function(req, res) {
-    let body = req.body;
-    let rol = new Rol({
-        nombre: body.nombre,
-        descripcion: body.descripcion,
-        disponible: body.disponible
-    });
+app.post('/AgregarRol', [verificaToken, verificarRol], function (req, res) {
+    const rol = new Rol();
+    const { nombre, descripcion } = req.body;
+    rol.nombre = nombre;
+    rol.descripcion = descripcion;
 
-    rol.save((err, rolDB) => {
-
+    rol.save((err, RolStored) => {
         if (err) {
-            return res.status(400).json({
-                ok: false,
-                err
-            });
+            res.status(500).send({ message: "El rol ya existe." });
+        } else {
+            if (!RolStored) {
+                res.status(404).send({ message: "Error al crear el rol." });
+            } else {
+                res.status(200).send({ message: "Rol creado exitosamente." });
+            }
         }
-        res.json({
-            ok: true,
-            rol: rolDB
-        });
     });
+
 });
 
 /* Actualizar un rol */
 
-app.put('ActualizarRol/:id', verificaToken, (req, res) => {
-    let id = req.params.id;
-    let body = req.body;
-
-    Rol.findById(id, (err, RolDB) => {
-
+app.put('/ActualizarRol/:id', [verificaToken, verificarRol], function (req, res) {
+    let RolData = req.body;
+    const params = req.params;
+    Rol.findByIdAndUpdate({ _id: params.id }, RolData, (err, RolUpdate) => {
         if (err) {
-            return res.status(500).json({
-                ok: false,
-                err
-            });
-        }
-
-        if (!RolDB) {
-            return res.status(400).json({
-                ok: false,
-                err: {
-                    message: 'El Id no existe'
-                }
-            });
-        }
-
-        RolDB.nombre = body.nombre;
-        RolDB.descripcion = body.descripcion;
-        RolDB.disponible = body.disponible;
-
-        RolDB.save((err, RolActualizado) => {
-            if (err) {
-                return res.status(500).json({
-                    ok: false,
-                    err
-                });
+            res.status(500).send({ message: "Datos Duplicados." });
+        } else {
+            if (!RolUpdate) {
+                res
+                    .status(404)
+                    .send({ message: "No se ha encontrado ningun rol." });
+            } else {
+                res.status(200).send({ message: "Rol actualizado correctamente." });
             }
-            res.json({
-                ok: true,
-                rol: RolActualizado
-            });
-        });
+        }
     });
 });
-
-
 
 
 /* Eliminar un rol */
-app.delete('/BorrarRol/:id', verificaToken, (req, res) => {
 
-    let id = req.params.id;
+app.delete('/BorrarRol/:id', [verificaToken, verificarRol], function (req, res) {
+    const { id } = req.params;
 
-    Rol.findById(id, (err, RolDB) => {
+    Rol.findByIdAndRemove(id, (err, userDeleted) => {
         if (err) {
-            return res.status(500).json({
-                ok: false,
-                err
-            });
-        }
-
-        if (!RolDB) {
-            return res.status(400).json({
-                ok: false,
-                err: {
-                    message: 'El Id no existe'
-                }
-            });
-        }
-
-        RolDB.disponible = false;
-
-        RolDB.save((err, RolBorrado) => {
-            if (err) {
-                return res.status(500).json({
-                    ok: false,
-                    err
-                });
+            res.status(500).send({ message: "Error del servidor." });
+        } else {
+            if (!userDeleted) {
+                res.status(404).send({ message: "Rol no encontrado." });
+            } else {
+                res
+                    .status(200)
+                    .send({ message: "El rol ha sido eliminado correctamente." });
             }
-
-            res.json({
-                ok: true,
-                rol: RolBorrado,
-                message: 'Rol Borrada'
-            });
-        });
+        }
     });
 });
-
-
 
 module.exports = app;
