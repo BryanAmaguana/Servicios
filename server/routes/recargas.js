@@ -1,6 +1,6 @@
 const express = require('express');
 const { verificaToken } = require('../middlewares/autenticacion');
-const Recargas = require('../models/Modulorecargas');
+const Recargas = require('../models/Recargas_Modulo');
 const app = express();
 
 

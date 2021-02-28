@@ -1,5 +1,5 @@
 const express = require('express');
-const Persona = require('../models/Modulopersona');
+const Persona = require('../models/Persona_Modulo');
 const { verificaToken } = require('../middlewares/autenticacion');
 const app = express();
 

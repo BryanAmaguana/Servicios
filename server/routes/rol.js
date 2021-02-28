@@ -1,6 +1,6 @@
 const express = require('express');
 const { verificaToken, verificarRol } = require('../middlewares/autenticacion');
-const Rol = require('../models/Modulorol');
+const Rol = require('../models/Rol_Modulo');
 
 const app = express();
 

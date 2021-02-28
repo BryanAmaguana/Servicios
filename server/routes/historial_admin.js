@@ -1,5 +1,5 @@
 const express = require('express');
-const Historial_admin = require('../models/Modulohistorial_admin');
+const Historial_admin = require('../models/Historial_Admin_Modulo');
 const app = express();
 
 

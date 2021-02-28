@@ -1,5 +1,5 @@
 const express = require('express');
-const Tipo = require('../models/tipo_pasajero');
+const Tipo = require('../models/Tipo_pasajero_Modulo');
 
 
 const { verificaToken, verificarRol } = require('../middlewares/autenticacion');

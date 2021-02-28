@@ -1,5 +1,5 @@
 const express = require('express');
-const Usuario = require('../models/ModulÍousuario');
+const Usuario = require('../models/Usuario_Modulo');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const multipart = require('connect-multiparty');

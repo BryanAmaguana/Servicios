@@ -1,6 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
-const Usuario = require('../models/Modulousuario');
+const Usuario = require('../models/Usuario_Modulo');
 const app = express();
 const jwt = require('../middlewares/jwt');
 

@@ -1,6 +1,6 @@
 const express = require('express');
 const { verificaToken } = require('../middlewares/autenticacion');
-const Ruta = require('../models/Moduloruta');
+const Ruta = require('../models/Ruta_Modulo');
 const app = express();
 
 
