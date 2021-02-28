@@ -1,6 +1,6 @@
 const jwt = require("../middlewares/jwt");
 const moment = require("moment");
-const User = require("../models/usuario");
+const User = require("../models/Modulousuario");
 
 function willExpireToken(token) {
   const { exp } = jwt.decodedToken(token);

@@ -1,5 +1,5 @@
 const express = require('express');
-const Cobro = require('../models/cobro_pasaje');
+const Cobro = require('../models/Modulocobro_pasaje');
 const { verificaToken, verificarRol } = require('../middlewares/autenticacion');
 const app = express();
 

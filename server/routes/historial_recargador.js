@@ -1,5 +1,5 @@
 const express = require('express');
-const Historial_recargador = require('../models/historial_recargadores');
+const Historial_recargador = require('../models/Modulohistorial_recargadores');
 const app = express();
 
 
