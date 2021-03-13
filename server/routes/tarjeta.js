@@ -3,188 +3,124 @@ const { verificaToken } = require('../middlewares/autenticacion');
 const Tarjeta = require('../models/Tarjeta_Modulo');
 const app = express();
 
+/* Obtener tarjetas Activas y desactivadas */
 
-/* Listar todas las tarjetas */
-
-app.get('/ObtenerTarjetas', verificaToken, function(req, res) {
-
-    Tarjeta.find({ disponible: true }).exec((err, tarjeta) => {
+app.get('/ObtenerTarjeta/:disponible/:desde/:limite', [verificaToken], (req, res) => {
+    let disponible = req.params.disponible;
+    const desde = req.params.desde;
+    const limite = req.params.limite;
+    Tarjeta.find({ disponible: disponible }).skip(Number(desde)).limit(Number(limite)).sort({ codigo: 1 }).exec((err, tarjeta) => {
         if (err) {
-            return res.status(400).json({
-                ok: false,
-                err
-            });
+            return res.status(400).send({ message: "No se encontro ninguna tarjeta." });
         }
         res.json({
-            ok: true,
-            tarjeta,
+            tarjeta: tarjeta
         });
     });
 });
 
+/* Agregar una tarjeta */
 
-/* Listado de tarjeta por codigo */
+app.post('/AgregarTarjeta', [verificaToken], function (req, res) {
+    const tarjeta = new Tarjeta();
 
-app.get('/BuscarTarjetaCodigo/:codigo', verificaToken, (req, res) => {
+    const { codigo, valor_tarjeta, descripcion } = req.body;
+    tarjeta.codigo = codigo;
+    tarjeta.valor_tarjeta = valor_tarjeta;
+    tarjeta.disponible = true;
+    tarjeta.descripcion = descripcion;
+
+    tarjeta.save((err, TarjetaStored) => {
+        if (err) {
+            res.status(500).send({ message: "La tarjeta ya existe." });
+        } else {
+            if (!TarjetaStored) {
+                res.status(404).send({ message: "Error al crear la tarjeta." });
+            } else {
+                res.status(200).send({ message: "Tarjeta creada exitosamente." });
+            }
+        }
+    });
+});
+
+/* Activar desactivar una tarjeta */
+
+app.put('/ActivarTarjeta/:id', [verificaToken], function activateBus(req, res) {
+    const { id } = req.params;
+    const { disponible } = req.body;
+
+    Tarjeta.findByIdAndUpdate({ _id: id }, { disponible: disponible }, (err, TarjetaActivado) => {
+        if (err) {
+            res.status(500).send({ message: "Error del servidor." });
+        } else {
+            if (!TarjetaActivado) {
+                res.status(404).send({ message: "No se ha encontrado ninguna Tarjeta." });
+            } else {
+                if (disponible) {
+                    res.status(200).send({ message: "Tarjeta activada correctamente." });
+                } else {
+                    res
+                        .status(200)
+                        .send({ message: "Tarjeta desactivada correctamente." });
+                }
+            }
+        }
+    });
+});
+
+
+/* Eliminar una Tarjeta */
+
+app.delete('/BorrarTarjeta/:id', [verificaToken], function (req, res) {
+    const { id } = req.params;
+
+    Tarjeta.findByIdAndRemove(id, (err, TarjetaDeleted) => {
+        if (err) {
+            res.status(500).send({ message: "Error del servidor." });
+        } else {
+            if (!TarjetaDeleted) {
+                res.status(404).send({ message: "Tarjeta no encontrada." });
+            } else {
+                res
+                    .status(200)
+                    .send({ message: "La tarjeta ha sido eliminada correctamente." });
+            }
+        }
+    });
+});
+
+/* Actualizar Tarjeta */
+
+app.put('/ActualizarTarjeta/:id', [verificaToken], function (req, res) {
+    let TarjetaData = req.body;
+    const params = req.params;
+
+    Tarjeta.findByIdAndUpdate({ _id: params.id }, TarjetaData, (err, TarjetaUpdate) => {
+        if (err) {
+            res.status(500).send({ message: "Datos Duplicados." });
+        } else {
+            if (!TarjetaUpdate) {
+                res
+                    .status(404)
+                    .send({ message: "No se ha encontrado ninguna Tarjeta." });
+            } else {
+                res.status(200).send({ message: "Tarjeta actualizada correctamente." });
+            }
+        }
+    });
+});
+
+/* Buscar Tarjeta por el codigo */
+
+app.get('/ObtenerTarjetaCodigo/:codigo/:disponible', [verificaToken], (req, res) => {
     let codigo = req.params.codigo;
-
-    Tarjeta.find({ disponible: true }, { codigo: codigo }).exec((err, tarjeta) => {
+    const disponible = req.params.disponible;
+    Tarjeta.find({ codigo: {'$regex': `${codigo}` , '$options': 'i'} }).find({disponible: disponible}).exec((err, tarjeta) => {
         if (err) {
-            return res.status(500).json({
-                ok: false,
-                err
-            });
-        }
-
-        if (!tarjeta) {
-            return res.status(500).json({
-                ok: false,
-                err: {
-                    message: 'Tarjeta no encontrado'
-                }
-            });
+            return res.status(400).send({ message: "No se encontro ninguna tarjeta." });
         }
         res.json({
-            ok: true,
-            tarjeta
-        });
-    });
-});
-
-/* Obtener la cantidad de tarjetas registradas */
-
-app.get('/CantidadTarjetas', verificaToken, function(req, res) {
-
-    Tarjeta.find({ disponible: true })
-        .exec((err, tarjeta) => {
-            if (err) {
-                return res.status(400).json({
-                    ok: false,
-                    err
-                });
-            }
-            //aqui va las condiciones para que cuente
-            Tarjeta.count({}, (err, conteo) => {
-                res.json({
-                    ok: true,
-                    cuantos: conteo
-                });
-            });
-        });
-});
-
-/* Agregar una nueva tarjeta */
-
-app.post('/AgregarTarjeta', verificaToken, function(req, res) {
-    let body = req.body;
-    let tarjeta = new Tarjeta({
-        codigo: body.codigo,
-        valor_tarjeta: body.valor_tarjeta,
-        tipo: body.tipo,
-        disponible: body.disponible,
-        descripcion: body.descripcion
-    })
-
-    tarjeta.save((err, TarjetaDB) => {
-        if (err) {
-            return res.status(400).json({
-                ok: false,
-                err
-            });
-        }
-        res.json({
-            ok: true,
-            tarjeta: TarjetaDB
-        });
-    });
-});
-
-
-
-/* Actualizar una tarjeta */
-
-app.put('ActualizarTarjeta/:id', verificaToken, (req, res) => {
-    let id = req.params.id;
-    let body = req.body;
-
-    Tarjeta.findById(id, (err, tarjetaDB) => {
-        if (err) {
-            return res.status(500).json({
-                ok: false,
-                err
-            });
-        }
-
-        if (!tarjetaDB) {
-            return res.status(400).json({
-                ok: false,
-                err: {
-                    message: 'El Id no existe'
-                }
-            });
-        }
-        tarjetaDB.codigo = body.codigo;
-        tarjetaDB.valor_tarjeta = body.valor_tarjeta;
-        tarjetaDB.tipo = body.tipo;
-        tarjetaDB.disponible = body.disponible;
-        tarjetaDB.descripcion = body.descripcion;
-
-        tarjetaDB.save((err, tarjetaActualizada) => {
-            if (err) {
-                return res.status(500).json({
-                    ok: false,
-                    err
-                });
-            }
-
-            res.json({
-                ok: true,
-                tarjeta: tarjetaActualizada
-            });
-        });
-    });
-});
-
-
-/* Eliminar una tarjeta */
-
-app.delete('/BorrarTarjeta/:id', verificaToken, (req, res) => {
-
-    let id = req.params.id;
-
-    Tarjeta.findById(id, (err, TarjetaDB) => {
-        if (err) {
-            return res.status(500).json({
-                ok: false,
-                err
-            });
-        }
-
-        if (!TarjetaDB) {
-            return res.status(400).json({
-                ok: false,
-                err: {
-                    message: 'El Id no existe'
-                }
-            });
-        }
-
-        TarjetaDB.disponible = false;
-
-        TarjetaDB.save((err, TarjetaBorrada) => {
-            if (err) {
-                return res.status(500).json({
-                    ok: false,
-                    err
-                });
-            }
-
-            res.json({
-                ok: true,
-                tarjeta: TarjetaBorrada,
-                message: 'Tarjeta Borrada'
-            });
-
+            tarjeta: tarjeta
         });
     });
 });

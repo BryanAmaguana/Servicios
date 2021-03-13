@@ -7,6 +7,7 @@ let TarjetaSchema = new Schema({
 
     codigo: {
         type: String,
+        unique: true,
         required: [true, "Codigo Obligatorio"]
     },
 
@@ -14,12 +15,6 @@ let TarjetaSchema = new Schema({
         type: Number,
         required: [true, "Valor Obligatorio"]
     },
-
-    tipo: {
-        type: String,
-        required: [true, "Disponibilidad Obligatorio"]
-    },
-
 
     disponible: {
         type: Boolean,
@@ -29,10 +24,9 @@ let TarjetaSchema = new Schema({
     descripcion: {
         type: String,
         required: false
-    },
-
+    }
 });
 
-TarjetaSchema.plugin(uniqueValidator, { message: 'Id de la tarjata ya registrado' });
+TarjetaSchema.plugin(uniqueValidator, { message: 'Codigo de tarjeta ya registrado' });
 
 module.exports = mongoose.model('Tarjeta', TarjetaSchema);
