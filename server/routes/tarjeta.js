@@ -45,7 +45,7 @@ app.post('/AgregarTarjeta', [verificaToken], function (req, res) {
 
 /* Activar desactivar una tarjeta */
 
-app.put('/ActivarTarjeta/:id', [verificaToken], function activateBus(req, res) {
+app.put('/ActivarTarjeta/:id', [verificaToken], function activateTarjeta(req, res) {
     const { id } = req.params;
     const { disponible } = req.body;
 

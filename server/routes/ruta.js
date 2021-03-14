@@ -1,186 +1,110 @@
 const express = require('express');
-const { verificaToken } = require('../middlewares/autenticacion');
+const { verificaToken, verificarRol } = require('../middlewares/autenticacion');
 const Ruta = require('../models/Ruta_Modulo');
 const app = express();
 
+/* Obtener ruta activas e inactivas */
 
-/* Obtener todas las rutas */
-
-app.get('/ObtenerRuta', verificaToken, function(req, res) {
-
-    Ruta.find({ disponible: true }).exec((err, ruta) => {
+app.get('/ObtenerRuta/:disponible', [verificaToken], (req, res) => {
+    let disponible = req.params.disponible;
+    Ruta.find({ disponible: disponible }).sort({ numero_ruta: 1 }).exec((err, ruta) => {
         if (err) {
-            return res.status(400).json({
-                ok: false,
-                err
-            });
+            return res.status(400).send({ message: "No se encontro ninguna ruta." });
         }
         res.json({
-            ok: true,
-            ruta,
+            ruta: ruta
         });
     });
-});
-
-/* Obtener la ruta por el nombre */
-
-app.get('/BuscarRutaNombre/:nombre', verificaToken, (req, res) => {
-    let nombre = req.params.nombre;
-
-    Ruta.find({ disponible: true }, { nombre_ruta: nombre }).exec((err, ruta) => {
-        if (err) {
-            return res.status(500).json({
-                ok: false,
-                err
-            });
-        }
-
-        if (!ruta) {
-            return res.status(500).json({
-                ok: false,
-                err: {
-                    message: 'Ruta no encontrado'
-                }
-            });
-        }
-        res.json({
-            ok: true,
-            ruta
-        });
-    });
-});
-
-
-/* Obtener la cantidad de rutas */
-
-app.get('/CantidadRutas', verificaToken, function(req, res) {
-
-    Ruta.find({ disponible: true })
-        .exec((err, ruta) => {
-            if (err) {
-                return res.status(400).json({
-                    ok: false,
-                    err
-                });
-            }
-            //aqui va las condiciones para que cuente
-            Ruta.count({}, (err, conteo) => {
-                res.json({
-                    ok: true,
-                    cuantos: conteo
-                });
-            });
-        });
 });
 
 /* Agregar una ruta */
 
-app.post('/AgregarRuta', verificaToken, function(req, res) {
-    let body = req.body;
-    let ruta = new Ruta({
-        nombre_ruta: body.nombre,
-        descripcion: body.descripcion,
-        disponible: doby.disponible
-    });
+app.post('/AgregarRuta', [verificaToken , verificarRol], function (req, res) {
+    const ruta = new Ruta();
 
-    ruta.save((err, RutaDB) => {
+    const { numero_ruta, nombre_ruta, descripcion } = req.body;
+    ruta.numero_ruta = numero_ruta;
+    ruta.nombre_ruta = nombre_ruta;
+    ruta.disponible = true;
+    ruta.descripcion = descripcion;
+
+    ruta.save((err, RutaStored) => {
         if (err) {
-            return res.status(400).json({
-                ok: false,
-                err
-            });
-        }
-        res.json({
-            ok: true,
-            ruta: RutaDB
-        });
-    });
-});
-
-/* Actualizar una ruta */
-
-app.put('ActualizarRuta/:id', verificaToken, (req, res) => {
-    let id = req.params.id;
-    let body = req.body;
-
-    Ruta.findById(id, (res, RutaDB) => {
-        if (err) {
-            return res.status(500).json({
-                ok: false,
-                err
-            });
-        }
-        if (!RutaDB) {
-            return res.status(400).json({
-                ok: false,
-                err: {
-                    message: 'El Id no existe'
-                }
-            });
-        }
-
-        RutaDB.nombre_ruta = body.nombre;
-        RutaDB.descripcion = body.descripcion;
-        RutaDB.disponible = docy.disponible;
-
-        RutaDB.save((err, RutaActualizada) => {
-            if (err) {
-                return res.status(500).json({
-                    ok: false,
-                    err
-                });
+            res.status(500).send({ message: "La ruta ya existe." });
+        } else {
+            if (!RutaStored) {
+                res.status(404).send({ message: "Error al crear la ruta." });
+            } else {
+                res.status(200).send({ message: "Ruta creada exitosamente." });
             }
-
-            res.json({
-                ok: true,
-                ruta: RutaActualizada
-            });
-        });
+        }
     });
 });
 
+/* Activar desactivar una Ruta */
 
-/* Eliminar una ruta */
+app.put('/ActivarRuta/:id', [verificaToken, verificarRol], function activateUser(req, res) {
+    const { id } = req.params;
+    const { disponible } = req.body;
+  
+    Ruta.findByIdAndUpdate({ _id: id }, { disponible }, (err, RutaActivada) => {
+      if (err) {
+        res.status(500).send({ message: "Error del servidor." });
+      } else {
+        if (!RutaActivada) {
+          res.status(404).send({ message: "No se ha encontrado ninguna Ruta." });
+        } else {
+          if (disponible) {
+            res.status(200).send({ message: "Ruta activado correctamente." });
+          } else {
+            res
+              .status(200)
+              .send({ message: "Ruta desactivado correctamente." });
+          }
+        }
+      }
+    });
+});
 
-app.delete('BorrarRuta/:id', verificaToken, (req, res) => {
-    let id = req.params.id;
+/* Eliminar una Ruta */
 
-    Ruta.findById(id, (err, RutaDB) => {
+app.delete('/BorrarRuta/:id', [verificaToken, verificarRol], function (req, res) {
+    const { id } = req.params;
+
+    Ruta.findByIdAndRemove(id, (err, RutaDeleted) => {
         if (err) {
-            return res.status(500).json({
-                ok: false,
-                err
-            });
-        }
-
-        if (!RutaDB) {
-            return res.status(400).json({
-                ok: false,
-                err: {
-                    message: 'El Id no existe'
-                }
-            });
-        }
-
-        RutaDB.disponible = false;
-
-        RutaDB.save((err, RutaBorrada) => {
-            if (err) {
-                return res.status(500).json({
-                    ok: false,
-                    err
-                });
+            res.status(500).send({ message: "Error del servidor." });
+        } else {
+            if (!RutaDeleted) {
+                res.status(404).send({ message: "Ruta no encontrada." });
+            } else {
+                res
+                    .status(200)
+                    .send({ message: "La Ruta ha sido eliminada correctamente." });
             }
-
-            res.json({
-                ok: true,
-                ruta: RutaBorrada,
-                message: 'Ruta Borrada'
-            });
-
-        });
+        }
     });
 });
 
+/* Actualizar Ruta */
+
+app.put('/ActualizarRuta/:id', [verificaToken, verificarRol], function (req, res) {
+    let RutaData = req.body;
+    const params = req.params;
+
+    Ruta.findByIdAndUpdate({ _id: params.id }, RutaData, (err, RutaUpdate) => {
+        if (err) {
+            res.status(500).send({ message: "Datos Duplicados." });
+        } else {
+            if (!RutaUpdate) {
+                res
+                    .status(404)
+                    .send({ message: "No se ha encontrado ninguna Ruta." });
+            } else {
+                res.status(200).send({ message: "Ruta actualizada correctamente." });
+            }
+        }
+    });
+});
 
 module.exports = app;
