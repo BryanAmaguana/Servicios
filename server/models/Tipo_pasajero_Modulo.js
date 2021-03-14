@@ -1,10 +1,12 @@
 const mongoose = require('mongoose');
 let Schema = mongoose.Schema;
+const uniqueValidator = require('mongoose-unique-validator');
 
 let TipoSchema = new Schema({
 
     nombre: {
         type: String,
+        unique: true,
         required: [true, "Nombre Obligatorio"]
     },
 
@@ -24,5 +26,7 @@ let TipoSchema = new Schema({
     }
 
 });
+
+TipoSchema.plugin(uniqueValidator, { message: 'Tipo de pasajero ya registrado' });
 
 module.exports = mongoose.model('Tipo_pasajero', TipoSchema);

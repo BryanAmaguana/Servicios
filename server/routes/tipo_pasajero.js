@@ -1,166 +1,111 @@
 const express = require('express');
-const Tipo = require('../models/Tipo_pasajero_Modulo');
-
-
 const { verificaToken, verificarRol } = require('../middlewares/autenticacion');
-
+const Tipo = require('../models/Tipo_pasajero_Modulo');
 const app = express();
 
+/* Obtener Tipo_Pasajero activas e inactivas */
 
-/* Obtener todos los tipos */
-
-app.get('/ObtenerTipos', verificaToken, (req, res) => {
-    Tipo.find({})
-        .exec((err, tipo) => {
-            if (err) {
-                return res.status(400).json({
-                    ok: false,
-                    err
-                });
-            }
-            res.json({
-                ok: true,
-                tipo,
-            });
-        });
-});
-
-/* Obtener cantidad de tipos */
-
-app.get('/CantidadTipo', verificaToken, function(req, res) {
-
-    Tipo.find({ disponible: true })
-        .exec((err, tipo) => {
-            if (err) {
-                return res.status(400).json({
-                    ok: false,
-                    err
-                });
-            }
-            //aqui va las condiciones para que cuente
-            Tipo.count({}, (err, conteo) => {
-                res.json({
-                    ok: true,
-                    cuantos: conteo
-                });
-            });
-        });
-});
-
-/* Agregar tipo */
-
-app.post('/AgregarTipo', [verificaToken, verificarRol], function(req, res) {
-    let body = req.body;
-    let tipo = new Tipo({
-        nombre: body.nombre,
-        valor: body.valor,
-        descripcion: bady.valor,
-        disponible: valor.descripcion
-    })
-
-    tipo.save((err, tipoDB) => {
-
+app.get('/ObtenerTipo_Pasajero/:disponible', [verificaToken], (req, res) => {
+    let disponible = req.params.disponible;
+    Tipo.find({ disponible: disponible }).sort({ nombre: 1 }).exec((err, tipo) => {
         if (err) {
-            return res.status(400).json({
-                ok: false,
-                err
-            });
+            return res.status(400).send({ message: "No se encontro ningun Tipo de pasajero." });
         }
         res.json({
-            ok: true,
-            tipo: tipoDB
+            tipo: tipo
         });
     });
 });
 
+/* Agregar un Tipo_Pasajero */
 
-/* Actualizar tipo */
+app.post('/AgregarTipo_Pasajero', [verificaToken , verificarRol], function (req, res) {
+    const tipo = new Tipo();
 
-app.put('ActualizarTipo/:id', [verificaToken, verificarRol], function(req, res) {
-    let id = req.params.id;
-    let body = req.body;
+    const { nombre,  valor, descripcion } = req.body;
+    tipo.nombre = nombre;
+    tipo.valor = valor;
+    tipo.disponible = true;
+    tipo.descripcion = descripcion;
 
-    Tipo.findById(id, (err, tipoDB) => {
+    tipo.save((err, TipoStored) => {
         if (err) {
-            return res.status(500).json({
-                ok: false,
-                err
-            });
-        }
-
-        if (!tipoDB) {
-            return res.status(400).json({
-                ok: false,
-                err: {
-                    message: 'El Id no existe'
-                }
-            });
-        }
-        tipoDB.nombre = body.nombre;
-        tipoDB.valor = body.valor;
-        tipoDB.descripcion = body.descripcion;
-        tipoDB.disponible = body.disponible;
-
-        tipoDB.save((err, tipoActualizada) => {
-            if (err) {
-                return res.status(500).json({
-                    ok: false,
-                    err
-                });
+            res.status(500).send({ message: "El tipo de pasajero ya existe." });
+        } else {
+            if (!TipoStored) {
+                res.status(404).send({ message: "Error al crear el tipo de pasajero." });
+            } else {
+                res.status(200).send({ message: "Tipo de pasajero creado exitosamente." });
             }
-
-            res.json({
-                ok: true,
-                tipo: tipoActualizada
-            });
-        });
+        }
     });
 });
 
+/* Activar desactivar un Tipo_Pasajero */
 
-/* Eliminar tipo */
+app.put('/ActivarTipo_Pasajero/:id', [verificaToken, verificarRol], function activateUser(req, res) {
+    const { id } = req.params;
+    const { disponible } = req.body;
+  
+    Tipo.findByIdAndUpdate({ _id: id }, { disponible }, (err, TipoActivada) => {
+      if (err) {
+        res.status(500).send({ message: "Error del servidor." });
+      } else {
+        if (!TipoActivada) {
+          res.status(404).send({ message: "No se ha encontrado ningun Tipo de pasajero." });
+        } else {
+          if (disponible) {
+            res.status(200).send({ message: "Tipo de pasajero activado correctamente." });
+          } else {
+            res
+              .status(200)
+              .send({ message: "Tipo de pasajero desactivado correctamente." });
+          }
+        }
+      }
+    });
+});
 
-app.delete('/BorrarTipo/:id', verificaToken, (req, res) => {
+/* Eliminar un Tipo_Pasajero */
 
-    let id = req.params.id;
+app.delete('/BorrarTipo_Pasajero/:id', [verificaToken, verificarRol], function (req, res) {
+    const { id } = req.params;
 
-    Tipo.findById(id, (err, TipoDB) => {
+    Tipo.findByIdAndRemove(id, (err, TipoDeleted) => {
         if (err) {
-            return res.status(500).json({
-                ok: false,
-                err
-            });
-        }
-
-        if (!TipoDB) {
-            return res.status(400).json({
-                ok: false,
-                err: {
-                    message: 'El Id no existe'
-                }
-            });
-        }
-
-        TipoDB.disponible = false;
-
-        TipoDB.save((err, TipoBorrada) => {
-            if (err) {
-                return res.status(500).json({
-                    ok: false,
-                    err
-                });
+            res.status(500).send({ message: "Error del servidor." });
+        } else {
+            if (!TipoDeleted) {
+                res.status(404).send({ message: "Tipo de pasajero no encontrada." });
+            } else {
+                res
+                    .status(200)
+                    .send({ message: "El Tipo de pasajero ha sido eliminado correctamente." });
             }
-
-            res.json({
-                ok: true,
-                tipo: TipoBorrada,
-                message: 'Tipo de pasajero Borrado'
-            });
-
-        });
+        }
     });
 });
 
+/* Actualizar Tipo_Pasajero */
+
+app.put('/ActualizarTipo_Pasajero/:id', [verificaToken, verificarRol], function (req, res) {
+    let TipoData = req.body;
+    const params = req.params;
+
+    Tipo.findByIdAndUpdate({ _id: params.id }, TipoData, (err, TipoUpdate) => {
+        if (err) {
+            res.status(500).send({ message: "Datos Duplicados." });
+        } else {
+            if (!TipoUpdate) {
+                res
+                    .status(404)
+                    .send({ message: "No se ha encontrado ningun Tipo de pasajero." });
+            } else {
+                res.status(200).send({ message: "Tipo de pasajero actualizado correctamente." });
+            }
+        }
+    });
+});
 
 
 module.exports = app;
