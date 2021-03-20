@@ -79,7 +79,7 @@ app.get('/BuscarPersonaCedula/:cedula_persona', [verificaToken], (req, res) => {
     let cedula_persona = req.params.cedula_persona;
     Persona.find({ cedula_persona: { '$regex': `${cedula_persona}`, '$options': 'i' } }).exec((err, persona) => {
         if (err) {
-            return res.status(400).send({ message: "No se encontro ningun usuario." });
+            return res.status(400).send({ message: "No se encontro ninguna persona." });
         }
         res.json({
             persona: persona

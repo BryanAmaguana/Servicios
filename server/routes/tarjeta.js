@@ -125,4 +125,16 @@ app.get('/ObtenerTarjetaCodigo/:codigo/:disponible', [verificaToken], (req, res)
     });
 });
 
+app.get('/ObtenerTarjetaCodigoP/:codigo', [verificaToken], (req, res) => {
+    let codigo = req.params.codigo;
+    Tarjeta.findOne({disponible: true, codigo: codigo}).then(tarjeta => {
+        if (!tarjeta) {
+            res.status(404).send({ message: "No se ha encontrado ninguna tarjeta." });
+        } else {
+            res.status(200).send({ tarjeta: tarjeta });
+        }
+    });
+});
+
+
 module.exports = app;
