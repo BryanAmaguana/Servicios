@@ -1,6 +1,7 @@
 const express = require('express');
-const { verificaToken } = require('../middlewares/autenticacion');
+const { verificaToken, verificarRol } = require('../middlewares/autenticacion');
 const Pasajero = require('../models/Pasajero_Modulo');
+const { AgregarHistorial } = require('../routes/historial_admin');
 
 const app = express();
 
@@ -32,6 +33,8 @@ app.post('/AgregarPasajero', [verificaToken], function (req, res) {
     pasajero.id_tipo_pasajero = id_tipo_pasajero;
     pasajero.disponible = true;
 
+    console.log(pasajero)
+
     pasajero.save((err, PasajeroStored) => {
         if (err) {
             res.status(500).send({ message: "El Pasajero ya existe." });
@@ -61,9 +64,7 @@ app.put('/ActivarPasajero/:id', [verificaToken], function activatePasajero(req, 
                 if (disponible) {
                     res.status(200).send({ message: "Pasajero activado correctamente." });
                 } else {
-                    res
-                        .status(200)
-                        .send({ message: "Pasajero desactivado correctamente." });
+                    res.status(200).send({ message: "Pasajero desactivado correctamente." });
                 }
             }
         }
@@ -72,9 +73,9 @@ app.put('/ActivarPasajero/:id', [verificaToken], function activatePasajero(req, 
 
 /* Eliminar un Pasajero */
 
-app.delete('/BorrarPasajero/:id', [verificaToken], function (req, res) {
+app.delete('/BorrarPasajero/:id', [verificaToken, verificarRol], function (req, res) {
     const { id } = req.params;
-
+    let usuario = req.user;
     Pasajero.findByIdAndRemove(id, (err, PasajeroDeleted) => {
         if (err) {
             res.status(500).send({ message: "Error del servidor." });
@@ -82,9 +83,8 @@ app.delete('/BorrarPasajero/:id', [verificaToken], function (req, res) {
             if (!PasajeroDeleted) {
                 res.status(404).send({ message: "Pasajero no encontrado." });
             } else {
-                res
-                    .status(200)
-                    .send({ message: "El Pasajero ha sido eliminado correctamente." });
+                res.status(200).send({ message: "El Pasajero ha sido eliminado correctamente." });
+                AgregarHistorial(usuario.id, "Borro pasajero: " + id);
             }
         }
     });
@@ -95,6 +95,7 @@ app.delete('/BorrarPasajero/:id', [verificaToken], function (req, res) {
 app.put('/ActualizarPasajero/:id', [verificaToken], function (req, res) {
     let PasajeroData = req.body;
     const params = req.params;
+    let usuario = req.user;
 
     Pasajero.findByIdAndUpdate({ _id: params.id }, PasajeroData, (err, PasajeroUpdate) => {
         if (err) {
@@ -106,6 +107,7 @@ app.put('/ActualizarPasajero/:id', [verificaToken], function (req, res) {
                     .send({ message: "No se ha encontrado ningun Pasajero." });
             } else {
                 res.status(200).send({ message: "Pasajero actualizado correctamente." });
+                AgregarHistorial(usuario.id, "Actualizo pasajero: " + params.id);
             }
         }
     });
@@ -116,7 +118,7 @@ app.put('/ActualizarPasajero/:id', [verificaToken], function (req, res) {
 app.get('/BuscarPasajeroCedula/:cedula_persona/:disponible', [verificaToken], (req, res) => {
     const cedula_persona = req.params.cedula_persona;
     const disponible = req.params.disponible;
-    Pasajero.find({ cedula_persona: { '$regex': `${cedula_persona}`, '$options': 'i' } }).find({disponible: disponible}).populate('id_persona').populate('id_tarjeta_pasajero').populate('id_tipo_pasajero').exec((err, pasajero) => {
+    Pasajero.find({ cedula_persona: { '$regex': `${cedula_persona}`, '$options': 'i' } }).find({ disponible: disponible }).populate('id_persona').populate('id_tarjeta_pasajero').populate('id_tipo_pasajero').exec((err, pasajero) => {
         if (err) {
             return res.status(400).send({ message: "No se encontro ningun pasajero." });
         }

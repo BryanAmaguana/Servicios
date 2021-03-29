@@ -1,6 +1,7 @@
 const express = require('express');
 const { verificaToken, verificarRol } = require('../middlewares/autenticacion');
 const Bus = require('../models/Bus_Modulo');
+const { AgregarHistorial } = require('../routes/historial_admin');
 
 const app = express();
 
@@ -25,7 +26,7 @@ app.get('/ObtenerBus/:disponible/:desde/:limite', [verificaToken], (req, res) =>
 /* Agregar un bus */
 app.post('/AgregarBus', [verificaToken, verificarRol], function (req, res) {
     const bus = new Bus();
-
+    let usuario = req.user;
     const { numero_bus, id_persona, placa_bus } = req.body;
     bus.numero_bus = numero_bus;
     bus.id_persona = id_persona;
@@ -40,6 +41,7 @@ app.post('/AgregarBus', [verificaToken, verificarRol], function (req, res) {
                 res.status(404).send({ message: "Error al crear el Bus." });
             } else {
                 res.status(200).send({ message: "Bus creado exitosamente." });
+                AgregarHistorial(usuario.id,"Agrego el bus: "+bus.numero_bus ,"Id rol: "+ usuario.rol);
             }
         }
     });
@@ -47,9 +49,10 @@ app.post('/AgregarBus', [verificaToken, verificarRol], function (req, res) {
 
 
 /* Activar/Desactivar Buses por el Id */
-app.put('/ActivarBuses/:id', [verificaToken], function activateBus(req, res) {
+app.put('/ActivarBuses/:id', [verificaToken, verificarRol], function activateBus(req, res) {
     const { id } = req.params;
     const { disponible } = req.body;
+    let usuario = req.user;
 
     Bus.findByIdAndUpdate({ _id: id }, { disponible }, (err, BusActivado) => {
         if (err) {
@@ -60,10 +63,10 @@ app.put('/ActivarBuses/:id', [verificaToken], function activateBus(req, res) {
             } else {
                 if (disponible) {
                     res.status(200).send({ message: "Bus activado correctamente." });
+                    AgregarHistorial(usuario.id,"Activo el bus id: "+id ,"Id rol: "+ usuario.rol);
                 } else {
-                    res
-                        .status(200)
-                        .send({ message: "Bus desactivado correctamente." });
+                    res.status(200).send({ message: "Bus desactivado correctamente." });
+                    AgregarHistorial(usuario.id,"desactivo el bus id: "+id ,"Id rol: "+ usuario.rol);
                 }
             }
         }
@@ -74,7 +77,7 @@ app.put('/ActivarBuses/:id', [verificaToken], function activateBus(req, res) {
 
 app.delete('/BorrarBus/:id', [verificaToken, verificarRol], function (req, res) {
     const { id } = req.params;
-
+    let usuario = req.user;
     Bus.findByIdAndRemove(id, (err, BusDeleted) => {
         if (err) {
             res.status(500).send({ message: "Error del servidor." });
@@ -82,9 +85,8 @@ app.delete('/BorrarBus/:id', [verificaToken, verificarRol], function (req, res) 
             if (!BusDeleted) {
                 res.status(404).send({ message: "Bus no encontrado." });
             } else {
-                res
-                    .status(200)
-                    .send({ message: "El Bus ha sido eliminado correctamente." });
+                res.status(200).send({ message: "El Bus ha sido eliminado correctamente." });
+                AgregarHistorial(usuario.id,"Borro el bus: "+id ,"Id rol: "+ usuario.rol);
             }
         }
     });
@@ -95,6 +97,7 @@ app.delete('/BorrarBus/:id', [verificaToken, verificarRol], function (req, res) 
 app.put('/ActualizarBus/:id', [verificaToken, verificarRol], function (req, res) {
     let BusData = req.body;
     const params = req.params;
+    let usuario = req.user;
 
     Bus.findByIdAndUpdate({ _id: params.id }, BusData, (err, busUpdate) => {
         if (err) {
@@ -106,6 +109,7 @@ app.put('/ActualizarBus/:id', [verificaToken, verificarRol], function (req, res)
                     .send({ message: "No se ha encontrado ningun Bus." });
             } else {
                 res.status(200).send({ message: "Bus actualizado correctamente." });
+                AgregarHistorial(usuario.id,"Actualizo el bus Id: "+params.id ,"Id rol: "+ usuario.rol);
             }
         }
     });

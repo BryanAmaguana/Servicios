@@ -27,8 +27,8 @@ if (process.env.PORT === 'dev') {
    //urlDB = 'mongodb://localhost:27017/union';
    urlDB = 'mongodb+srv://Bryan:Bryan1996@cluster0.vfala.mongodb.net/union'
 } else {
-   urlDB = 'mongodb+srv://Bryan:Bryan1996@cluster0.vfala.mongodb.net/union'
-  // urlDB = 'mongodb://localhost:27017/union';
+  // urlDB = 'mongodb+srv://Bryan:Bryan1996@cluster0.vfala.mongodb.net/union'
+  urlDB = 'mongodb://localhost:27017/union';
 }
 
 process.env.URLDB = urlDB;

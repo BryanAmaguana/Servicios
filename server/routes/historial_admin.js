@@ -2,48 +2,23 @@ const express = require('express');
 const Historial_admin = require('../models/Historial_Admin_Modulo');
 const app = express();
 
+/* Agregar hisorial */
 
-/* Obtener todo el historial */
+let AgregarHistorial = (id_usuario, accion_admin, descripcion) => {
+    const Historial = new Historial_admin();
+    const f = new Date();
+    Historial.fecha_accion = f;
+    Historial.accion_admin = accion_admin;
+    Historial.id_usuario = id_usuario;
+    Historial.descripcion = descripcion;
 
-app.get('/ObtenerHistorial', function(req, res) {
-
-    Historial_admin.find({}).exec((err, historial) => {
-        if (err) {
-            return res.status(400).json({
-                ok: false,
-                err
-            });
+    Historial.save((err, HistorialStored) => {
+        if (!HistorialStored) {
+            console.log("Error al ingresar." + err)
         }
-        res.json({
-            ok: true,
-            historial,
-        });
     });
-});
+}
 
-/* Agregar historial */
-
-app.post('/AgregarHistorial', function(req, res) {
-    let body = req.body;
-    let historial = new Historial_admin({
-        fecha_accion: body.fecha,
-        accion_admin: body.accion,
-        descripcion: body.descripcion,
-        id_usuario: body.id_usuario
-    });
-
-    historial.save((err, HistorialDB) => {
-        if (err) {
-            return res.status(400).json({
-                ok: false,
-                err
-            });
-        }
-        res.json({
-            ok: true,
-            historial: HistorialDB
-        });
-    });
-});
-
-module.exports = app;
+module.exports = {
+    AgregarHistorial
+}

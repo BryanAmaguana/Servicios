@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const Usuario = require('../models/Usuario_Modulo');
 const app = express();
 const jwt = require('../middlewares/jwt');
-
+const { AgregarHistorial } = require('../routes/historial_admin');
 
 app.post('/login',  (req, res) =>  {
     const params = req.body;
@@ -39,45 +39,5 @@ app.post('/login',  (req, res) =>  {
       }
     });
   });
-
-/* app.post('/login', (req, res) => {
-
-    let body = req.body;
-    Usuario.findOne({ email: body.email }, (err, usuarioDB) => {
-        if (err) {
-            return res.status(400).json({
-                ok: false,
-                err
-            });
-        }
-        if (!usuarioDB) {
-            return res.status(400).json({
-                ok: false,
-                err: {
-                    message: 'Usuario incorrecto'
-                }
-            });
-        }
-
-        if (bcrypt.compareSync(body.contrasena, usuarioDB.contrasena)) {
-            return res.status(400).json({
-                ok: false,
-                err: {
-                    message: 'Contraseña incorrecto'
-                }
-            });
-        }
-
-        let token = jwt.sign({
-            usuario: usuarioDB
-        }, process.env.SEED, { expiresIn: process.env.CADUCIDAD_TOKEN });
-
-        res.json({
-            ok: true,
-            usuario: usuarioDB,
-            token
-        });
-    });
-}); */
 
 module.exports = app;

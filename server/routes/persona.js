@@ -1,6 +1,6 @@
 const express = require('express');
 const Persona = require('../models/Persona_Modulo');
-const { verificaToken } = require('../middlewares/autenticacion');
+const { verificaToken, verificarRol } = require('../middlewares/autenticacion');
 const app = express();
 
 /* Obtener Listado todas las personas paginadas */
@@ -111,7 +111,7 @@ app.put('/ActualizarPersona/:id', [verificaToken], function (req, res) {
 
 /* Eliminar un usuario */
 
-app.delete('/BorrarPersona/:id', [verificaToken], function (req, res) {
+app.delete('/BorrarPersona/:id', [verificaToken, verificarRol], function (req, res) {
     const { id } = req.params;
   
     Persona.findByIdAndRemove(id, (err, personaDeleted) => {

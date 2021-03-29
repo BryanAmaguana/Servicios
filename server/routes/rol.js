@@ -1,6 +1,7 @@
 const express = require('express');
 const { verificaToken, verificarRol } = require('../middlewares/autenticacion');
 const Rol = require('../models/Rol_Modulo');
+const { AgregarHistorial } = require('../routes/historial_admin');
 
 const app = express();
 
@@ -105,6 +106,7 @@ app.post('/AgregarRol', [verificaToken, verificarRol], function (req, res) {
     const { nombre, descripcion } = req.body;
     rol.nombre = nombre;
     rol.descripcion = descripcion;
+    let usuario = req.user;
 
     rol.save((err, RolStored) => {
         if (err) {
@@ -114,6 +116,7 @@ app.post('/AgregarRol', [verificaToken, verificarRol], function (req, res) {
                 res.status(404).send({ message: "Error al crear el rol." });
             } else {
                 res.status(200).send({ message: "Rol creado exitosamente." });
+                AgregarHistorial(usuario.id, "Creo el rol: " + rol.id);
             }
         }
     });
@@ -125,7 +128,8 @@ app.post('/AgregarRol', [verificaToken, verificarRol], function (req, res) {
 app.put('/ActualizarRol/:id', [verificaToken, verificarRol], function (req, res) {
     let RolData = req.body;
     const params = req.params;
-    Rol.findByIdAndUpdate({ _id: params.id }, RolData, (err, RolUpdate) => {
+    let usuario = req.user;
+    Rol.findByIdAndUpdate( params.id, RolData, (err, RolUpdate) => {
         if (err) {
             res.status(500).send({ message: "Datos Duplicados." });
         } else {
@@ -135,6 +139,7 @@ app.put('/ActualizarRol/:id', [verificaToken, verificarRol], function (req, res)
                     .send({ message: "No se ha encontrado ningun rol." });
             } else {
                 res.status(200).send({ message: "Rol actualizado correctamente." });
+                AgregarHistorial(usuario.id, "Actualizo el rol: " + params.id);
             }
         }
     });

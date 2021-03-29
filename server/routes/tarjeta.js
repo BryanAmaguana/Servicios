@@ -2,6 +2,7 @@ const express = require('express');
 const { verificaToken } = require('../middlewares/autenticacion');
 const Tarjeta = require('../models/Tarjeta_Modulo');
 const app = express();
+const { AgregarHistorial } = require('../routes/historial_admin');
 
 /* Obtener tarjetas Activas y desactivadas */
 
@@ -73,6 +74,7 @@ app.put('/ActivarTarjeta/:id', [verificaToken], function activateTarjeta(req, re
 
 app.delete('/BorrarTarjeta/:id', [verificaToken], function (req, res) {
     const { id } = req.params;
+    let usuario = req.user;
 
     Tarjeta.findByIdAndRemove(id, (err, TarjetaDeleted) => {
         if (err) {
@@ -84,6 +86,7 @@ app.delete('/BorrarTarjeta/:id', [verificaToken], function (req, res) {
                 res
                     .status(200)
                     .send({ message: "La tarjeta ha sido eliminada correctamente." });
+                    AgregarHistorial(usuario.id,"Borro la tarjeta: "+id);
             }
         }
     });

@@ -2,6 +2,7 @@ const express = require('express');
 const { verificaToken, verificarRol } = require('../middlewares/autenticacion');
 const Tipo = require('../models/Tipo_pasajero_Modulo');
 const app = express();
+const { AgregarHistorial } = require('../routes/historial_admin');
 
 /* Obtener Tipo_Pasajero activas e inactivas */
 
@@ -21,6 +22,7 @@ app.get('/ObtenerTipo_Pasajero/:disponible', [verificaToken], (req, res) => {
 
 app.post('/AgregarTipo_Pasajero', [verificaToken , verificarRol], function (req, res) {
     const tipo = new Tipo();
+    let usuario = req.user;
 
     const { nombre,  valor, descripcion } = req.body;
     tipo.nombre = nombre;
@@ -36,6 +38,7 @@ app.post('/AgregarTipo_Pasajero', [verificaToken , verificarRol], function (req,
                 res.status(404).send({ message: "Error al crear el tipo de pasajero." });
             } else {
                 res.status(200).send({ message: "Tipo de pasajero creado exitosamente." });
+                AgregarHistorial(usuario.id,"Agrego Tipo_Pasajero: "+tipo.id, tipo.nombre);
             }
         }
     });
@@ -46,7 +49,8 @@ app.post('/AgregarTipo_Pasajero', [verificaToken , verificarRol], function (req,
 app.put('/ActivarTipo_Pasajero/:id', [verificaToken, verificarRol], function activateUser(req, res) {
     const { id } = req.params;
     const { disponible } = req.body;
-  
+    let usuario = req.user;
+
     Tipo.findByIdAndUpdate({ _id: id }, { disponible }, (err, TipoActivada) => {
       if (err) {
         res.status(500).send({ message: "Error del servidor." });
@@ -56,10 +60,12 @@ app.put('/ActivarTipo_Pasajero/:id', [verificaToken, verificarRol], function act
         } else {
           if (disponible) {
             res.status(200).send({ message: "Tipo de pasajero activado correctamente." });
+            AgregarHistorial(usuario.id,"Activo Tipo_Pasajero: "+id);
           } else {
             res
               .status(200)
               .send({ message: "Tipo de pasajero desactivado correctamente." });
+              AgregarHistorial(usuario.id,"Desactivos Tipo_Pasajero: "+id, );
           }
         }
       }
@@ -70,6 +76,7 @@ app.put('/ActivarTipo_Pasajero/:id', [verificaToken, verificarRol], function act
 
 app.delete('/BorrarTipo_Pasajero/:id', [verificaToken, verificarRol], function (req, res) {
     const { id } = req.params;
+    let usuario = req.user;
 
     Tipo.findByIdAndRemove(id, (err, TipoDeleted) => {
         if (err) {
@@ -81,6 +88,7 @@ app.delete('/BorrarTipo_Pasajero/:id', [verificaToken, verificarRol], function (
                 res
                     .status(200)
                     .send({ message: "El Tipo de pasajero ha sido eliminado correctamente." });
+                    AgregarHistorial(usuario.id,"Elimino Tipo_Pasajero: "+id);
             }
         }
     });
@@ -91,6 +99,7 @@ app.delete('/BorrarTipo_Pasajero/:id', [verificaToken, verificarRol], function (
 app.put('/ActualizarTipo_Pasajero/:id', [verificaToken, verificarRol], function (req, res) {
     let TipoData = req.body;
     const params = req.params;
+    let usuario = req.user;
 
     Tipo.findByIdAndUpdate({ _id: params.id }, TipoData, (err, TipoUpdate) => {
         if (err) {
@@ -102,6 +111,7 @@ app.put('/ActualizarTipo_Pasajero/:id', [verificaToken, verificarRol], function 
                     .send({ message: "No se ha encontrado ningun Tipo de pasajero." });
             } else {
                 res.status(200).send({ message: "Tipo de pasajero actualizado correctamente." });
+                AgregarHistorial(usuario.id,"Actualizo Tipo_Pasajero: "+params.id);
             }
         }
     });

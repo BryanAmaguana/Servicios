@@ -7,8 +7,20 @@ const md_upload_avatar = multipart({ uploadDir: "./uploads/avatar" });
 const fs = require("fs");
 const path = require("path");
 const { verificaToken, verificarRol } = require('../middlewares/autenticacion');
-
+const Historial_admin = require('../models/Historial_Admin_Modulo');
 const app = express();
+const { AgregarHistorial } = require('../routes/historial_admin');
+
+app.get('/ObtenerHistorial', function (req, res) {
+    Historial_admin.find({}).exec((err, Historial) => {
+        if (err) {
+            return res.status(400).send({ message: "No se encontro historial." });
+        }
+        res.json({
+            historial: Historial
+        });
+    });
+});
 
 /* Obtener todos los usuarios */
 
@@ -102,7 +114,7 @@ function validarEmail(correo){
 
 app.post('/AgregarUsuario',[verificaToken, verificarRol], function (req, res) {
     const usuario = new Usuario();
-
+    let usuariohistoria = req.user;
     const { nombre_usuario, contrasena, correo, id_persona, id_rol, fecha_registro_Usuario, contrasenaR, avatar } = req.body;
     usuario.nombre_usuario = nombre_usuario;
     usuario.correo = correo;
@@ -137,6 +149,7 @@ app.post('/AgregarUsuario',[verificaToken, verificarRol], function (req, res) {
                                     res.status(404).send({ message: "Error al crear el usuario." });
                                 } else {
                                     res.status(200).send({ message: "Usuario creado exitosamente." });
+                                    AgregarHistorial(usuariohistoria.id, "Creo el usuario: " + usuario.id);
                                 }
                             }
                         });
@@ -155,6 +168,7 @@ app.post('/AgregarUsuario',[verificaToken, verificarRol], function (req, res) {
 app.put('/ActualizarUsuario/:id', [verificaToken, verificarRol], function (req, res) {
         let userData = req.body;
         const params = req.params;
+        let usuariohistoria = req.user;
 
         if(!validarEmail(userData.correo)){
            return  res.status(404).send({ message: "Correo Invalido." });
@@ -179,6 +193,7 @@ app.put('/ActualizarUsuario/:id', [verificaToken, verificarRol], function (req, 
                               .send({ message: "No se ha encontrado ningun usuario." });
                           } else {
                             res.status(200).send({ message: "Usuario actualizado correctamente." });
+                            AgregarHistorial(usuariohistoria.id, "Actualizo el usuario: " + params.id);
                           }
                         }
                       });
@@ -196,6 +211,7 @@ app.put('/ActualizarUsuario/:id', [verificaToken, verificarRol], function (req, 
                       .send({ message: "No se ha encontrado ningun usuario." });
                   } else {
                     res.status(200).send({ message: "Usuario actualizado correctamente." });
+                    AgregarHistorial(usuariohistoria.id, "Actualizo el usuario: " + params.id);
                   }
                 }
               });
@@ -206,6 +222,7 @@ app.put('/ActualizarUsuario/:id', [verificaToken, verificarRol], function (req, 
 
 app.delete('/BorrarUsuario/:id', [verificaToken, verificarRol], function (req, res) {
     const { id } = req.params;
+    let usuariohistoria = req.user;
   
     Usuario.findByIdAndRemove(id, (err, userDeleted) => {
       if (err) {
@@ -217,6 +234,7 @@ app.delete('/BorrarUsuario/:id', [verificaToken, verificarRol], function (req, r
           res
             .status(200)
             .send({ message: "El usuario ha sido eliminado correctamente." });
+            AgregarHistorial(usuariohistoria.id, "Borro el usuario: " + id);
         }
       }
     });
@@ -226,7 +244,7 @@ app.delete('/BorrarUsuario/:id', [verificaToken, verificarRol], function (req, r
 
 app.put('/ActualizarAvatar/:id', [verificaToken, md_upload_avatar], function (req, res) {
     const body = req.params;
-    let now = new Date();
+    let usuariohistoria = req.user;
     Usuario.findById({ _id: body.id }, (err, userData) => {
         if (err) {
             res.status(500).send({ message: "Error del servidor." });
@@ -267,6 +285,7 @@ app.put('/ActualizarAvatar/:id', [verificaToken, md_upload_avatar], function (re
                                             .send({ message: "No se ha encontrado ningun usuario." });
                                     } else {
                                         res.status(200).send({ avatarName: fileName });
+                                        AgregarHistorial(usuariohistoria.id, "Actualizo el avatar del usuario: " + body.id);
                                     }
                                 }
                             }
@@ -298,7 +317,8 @@ app.get('/ObtenerURLAvatar/:avatarName', function (req, res) {
 app.put('/ActivarUsuario/:id', [verificaToken, verificarRol], function activateUser(req, res) {
     const { id } = req.params;
     const { disponible } = req.body;
-  
+    let usuariohistoria = req.user;
+
     Usuario.findByIdAndUpdate({ _id: id }, { disponible }, (err, UsuarioActivado) => {
       if (err) {
         res.status(500).send({ message: "Error del servidor." });
@@ -308,10 +328,12 @@ app.put('/ActivarUsuario/:id', [verificaToken, verificarRol], function activateU
         } else {
           if (disponible) {
             res.status(200).send({ message: "Usuario activado correctamente." });
+            AgregarHistorial(usuariohistoria.id, "Activo el usuario: " + id);
           } else {
             res
               .status(200)
               .send({ message: "Usuario desactivado correctamente." });
+              AgregarHistorial(usuariohistoria.id, "Desactivo el usuario: " + id);
           }
         }
       }
