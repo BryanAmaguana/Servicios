@@ -4,7 +4,7 @@ const Menu = require('../models/Menu_Modulo');
 const { verificaToken, verificarRol } = require('../middlewares/autenticacion');
 
 /* Agregar menu */
-app.post('/AddMenu', [verificaToken], function (req, res) {
+app.post('/AddMenu', [verificaToken, verificarRol], function (req, res) {
     const menu = new Menu();
     
     const { titulo, url, order, disponible } = req.body;
@@ -44,7 +44,7 @@ app.get('/ObtenerMenu', function (req, res) {
 });
 
 
-app.put('/ActualizarMenu/:id', [verificaToken], function (req, res) {
+app.put('/ActualizarMenu/:id', [verificaToken, verificarRol], function (req, res) {
     let menuData = req.body;
     const params = req.params;
   

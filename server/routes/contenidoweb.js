@@ -31,10 +31,10 @@ app.post('/AddContenido', function (req, res) {
     });
 });
 
-
 app.get('/ObtenerContenido', function (req, res) {
     Contenido.find().sort({ order: "asc" }).exec((err, contenidoStored) => {
         if (err) {
+            console.log(err)
             res.status(500).send({ message: "Error del servidor." });
         } else {
             if (!contenidoStored) {
@@ -47,7 +47,6 @@ app.get('/ObtenerContenido', function (req, res) {
         }
     });
 });
-
 
 app.put('/ActualizarContenido/:id', [verificaToken], function (req, res) {
     let contenidoData = req.body;
@@ -86,7 +85,6 @@ app.put('/ActivarContenido/:id', [verificaToken], function (req, res) {
         }
     });
 });
-
 
 app.delete('/BorrarContenido/:id', [verificaToken], function (req, res) {
     const { id } = req.params;

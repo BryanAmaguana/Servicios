@@ -4,30 +4,66 @@ const mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 
 let ContenidoSchema = new Schema({
-    titulo: {
-        type: String,
-        required: [true, "Titulo Requerido"]
-    },
-
-    contenido: {
-        type: String,
-        required: [true, "url Requerido"]
-    },
-
-    fondo: {
+    nombre: {
         type: String,
         required: false
     },
 
-    order: {
+    mensaje_Inicio: {
         type: String,
         required: false
     },
 
-    disponible: {
-        type: Boolean,
-        required: [true, "Disponiblilidad Obligatoria"]
+    mensaje_Inicio2: {
+        type: String,
+        required: false
+    },
+
+    descripcion: {
+        type: String,
+        required: false
+    },
+
+    correo: {
+        type: String,
+        required: false
+    },
+
+    telefono: {
+        type: String,
+        required: false
+    },
+
+    Celular: {
+        type: String,
+        required: false
+    },
+
+    fax: {
+        type: String,
+        required: false
+    },
+
+    direccion: {
+        type: String,
+        required: false
+    },
+
+    mision: {
+        type: String,
+        required: false
+    },
+
+    vision: {
+        type: String,
+        required: false
+    },
+
+    historia: {
+        type: String,
+        required: false
     }
+
 });
 
 
