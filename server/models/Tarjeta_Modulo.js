@@ -25,6 +25,11 @@ let TarjetaSchema = new Schema({
         type: Schema.ObjectId,
         ref: 'Tipo_pasajero',
         required: [true, "Tipo de pasajero obligatorio"]
+    },
+
+    bloqueo: {
+        type: String,
+        required: [true, "Tipo de pasajero obligatorio"]
     }
 });
 

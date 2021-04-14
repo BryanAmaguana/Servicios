@@ -30,6 +30,7 @@ app.post('/AgregarTarjeta', [verificaToken], function (req, res) {
     tarjeta.valor_tarjeta = valor_tarjeta;
     tarjeta.disponible = true;
     tarjeta.descripcion = descripcion;
+    tarjeta.bloqueo = ""
 
     tarjeta.save((err, TarjetaStored) => {
         if (err) {

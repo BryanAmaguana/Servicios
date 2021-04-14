@@ -41,11 +41,11 @@ app.get('/ObtenerRecargas/:inicio/:fin/:id_usuario', [verificaToken], (req, res)
 
 app.post('/AgregarRecarga', function (req, res) {
     const cobro = new Cobro();
-    const { valor_recarga, id_tarjeta_recargada, id_usuario } = req.body;
-    cobro.id_tarjeta_recargada = id_tarjeta_recargada;
-    cobro.valor_recarga = valor_recarga;
+    const { valor_recarga, codigo_tarjeta, nombre_usuario } = req.body;
     cobro.fecha_hora_Accion = f;
-    cobro.id_usuario = id_usuario;
+    cobro.valor_recarga = valor_recarga;
+    cobro.codigo_tarjeta = codigo_tarjeta;
+    cobro.nombre_usuario = nombre_usuario;
 
     cobro.save((err, RecargaStored) => {
         if (err) {

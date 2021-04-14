@@ -25,7 +25,6 @@ app.use(require('./recorrido'));
 app.use(require('./pasajero'));
 app.use(require('./cobro_pasaje'));
 app.use(require('./recargas'));
-app.use(require('./historial_recargador'));
 app.use(require('./tipo_pasajero'));
 app.use(require('./menu'));
 app.use(require('./auth'));

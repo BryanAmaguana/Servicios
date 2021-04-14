@@ -5,16 +5,14 @@ let Schema = mongoose.Schema;
 
 let Cobro_pasajeSchema = new Schema({
 
-    id_tarjeta: {
-        type: Schema.ObjectId,
-        ref: 'Tarjeta',
-        required: [true, "id de la tarjeta Obligatorio"]
+    codigo_tarjeta: {
+        type: String,
+        required: [true, "Codigo de la tarjeta Obligatorio"]
     },
 
-    id_bus_cobro: {
-        type: Schema.ObjectId,
-        ref: 'Bus',
-        required: [true, "id bus Obligatorio"]
+    numero_bus_cobro: {
+        type: String,
+        required: [true, "Numero bus Obligatorio"]
     },
 
     fecha_hora_cobro: {

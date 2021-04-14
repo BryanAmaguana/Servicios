@@ -14,15 +14,13 @@ let RecargasSchema = new Schema({
         required: false
     },
 
-    id_tarjeta_recargada: {
-        type: Schema.ObjectId,
-        ref: 'Tarjeta',
+    codigo_tarjeta: {
+        type: String,
         required: false
     },
 
-    id_usuario: {
-        type: Schema.ObjectId,
-        ref: 'Usuario',
+    nombre_usuario: {
+        type: String,
         required: [true, "id del usuario requerido"]
     },
 
