@@ -22,8 +22,9 @@ let TarjetaSchema = new Schema({
     },
 
     descripcion: {
-        type: String,
-        required: false
+        type: Schema.ObjectId,
+        ref: 'Tipo_pasajero',
+        required: [true, "Tipo de pasajero obligatorio"]
     }
 });
 

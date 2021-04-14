@@ -9,11 +9,6 @@ let RecargasSchema = new Schema({
         required: [true, "Fecha hora Obligatorio"]
     },
 
-    accion_recargador: {
-        type: String,
-        required: [true, "Accion Obligatoria"]
-    },
-
     valor_recarga: {
         type: Number,
         required: false

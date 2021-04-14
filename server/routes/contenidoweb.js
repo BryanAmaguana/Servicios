@@ -19,7 +19,6 @@ app.post('/AddContenido', function (req, res) {
 
     contenido.save((err, createdMenu) => {
         if (err) {
-            console.log(err)
             res.status(500).send({ message: "Error del servidor." });
         } else {
             if (!createdMenu) {
@@ -34,7 +33,6 @@ app.post('/AddContenido', function (req, res) {
 app.get('/ObtenerContenido', function (req, res) {
     Contenido.find().sort({ order: "asc" }).exec((err, contenidoStored) => {
         if (err) {
-            console.log(err)
             res.status(500).send({ message: "Error del servidor." });
         } else {
             if (!contenidoStored) {

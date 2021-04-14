@@ -41,7 +41,7 @@ app.post('/AgregarBus', [verificaToken, verificarRol], function (req, res) {
                 res.status(404).send({ message: "Error al crear el Bus." });
             } else {
                 res.status(200).send({ message: "Bus creado exitosamente." });
-                AgregarHistorial(usuario.id,"Agrego el bus: "+bus.numero_bus ,"Id rol: "+ usuario.rol);
+                AgregarHistorial(usuario.id,"Agrego el bus: "+bus.numero_bus );
             }
         }
     });
@@ -63,10 +63,10 @@ app.put('/ActivarBuses/:id', [verificaToken, verificarRol], function activateBus
             } else {
                 if (disponible) {
                     res.status(200).send({ message: "Bus activado correctamente." });
-                    AgregarHistorial(usuario.id,"Activo el bus id: "+id ,"Id rol: "+ usuario.rol);
+                    AgregarHistorial(usuario.id,"Activo el bus id: "+id );
                 } else {
                     res.status(200).send({ message: "Bus desactivado correctamente." });
-                    AgregarHistorial(usuario.id,"desactivo el bus id: "+id ,"Id rol: "+ usuario.rol);
+                    AgregarHistorial(usuario.id,"desactivo el bus id: "+id );
                 }
             }
         }
@@ -86,7 +86,7 @@ app.delete('/BorrarBus/:id', [verificaToken, verificarRol], function (req, res) 
                 res.status(404).send({ message: "Bus no encontrado." });
             } else {
                 res.status(200).send({ message: "El Bus ha sido eliminado correctamente." });
-                AgregarHistorial(usuario.id,"Borro el bus: "+id ,"Id rol: "+ usuario.rol);
+                AgregarHistorial(usuario.id,"Borro el bus: "+id);
             }
         }
     });
@@ -109,7 +109,7 @@ app.put('/ActualizarBus/:id', [verificaToken, verificarRol], function (req, res)
                     .send({ message: "No se ha encontrado ningun Bus." });
             } else {
                 res.status(200).send({ message: "Bus actualizado correctamente." });
-                AgregarHistorial(usuario.id,"Actualizo el bus Id: "+params.id ,"Id rol: "+ usuario.rol);
+                AgregarHistorial(usuario.id,"Actualizo el bus Id: "+params.id);
             }
         }
     });

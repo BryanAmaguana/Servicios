@@ -11,8 +11,9 @@ const Historial_admin = require('../models/Historial_Admin_Modulo');
 const app = express();
 const { AgregarHistorial } = require('../routes/historial_admin');
 
-app.get('/ObtenerHistorial', function (req, res) {
-    Historial_admin.find({}).exec((err, Historial) => {
+
+app.get('/Historial', function (req, res) {
+    Historial_admin.find({}).populate('id_usuario').exec((err, Historial) => {
         if (err) {
             return res.status(400).send({ message: "No se encontro historial." });
         }

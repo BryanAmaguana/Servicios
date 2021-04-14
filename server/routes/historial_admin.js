@@ -1,13 +1,15 @@
 const express = require('express');
 const Historial_admin = require('../models/Historial_Admin_Modulo');
 const app = express();
+//const moment = require('moment-timezone');
+//const f = moment().tz("America/Guayaquil").format();
 
 /* Agregar hisorial */
 
 let AgregarHistorial = (id_usuario, accion_admin, descripcion) => {
     const Historial = new Historial_admin();
-    const f = new Date();
-    Historial.fecha_accion = f;
+    var f = new Date();
+    Historial.fecha_accion = (f.getDate() + "/" + (f.getMonth() +1) + "/" + f.getFullYear()+"/" + f.getHours()+ ":"+ f.getMinutes()+":"+ f.getSeconds());;
     Historial.accion_admin = accion_admin;
     Historial.id_usuario = id_usuario;
     Historial.descripcion = descripcion;

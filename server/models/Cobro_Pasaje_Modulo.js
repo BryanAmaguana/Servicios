@@ -5,10 +5,10 @@ let Schema = mongoose.Schema;
 
 let Cobro_pasajeSchema = new Schema({
 
-    id_pasajero: {
+    id_tarjeta: {
         type: Schema.ObjectId,
-        ref: 'Pasajero',
-        required: [true, "id del pasajero Obligatorio"]
+        ref: 'Tarjeta',
+        required: [true, "id de la tarjeta Obligatorio"]
     },
 
     id_bus_cobro: {

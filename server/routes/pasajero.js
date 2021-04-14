@@ -32,9 +32,6 @@ app.post('/AgregarPasajero', [verificaToken], function (req, res) {
     pasajero.id_tarjeta_pasajero = id_tarjeta_pasajero;
     pasajero.id_tipo_pasajero = id_tipo_pasajero;
     pasajero.disponible = true;
-
-    console.log(pasajero)
-
     pasajero.save((err, PasajeroStored) => {
         if (err) {
             res.status(500).send({ message: "El Pasajero ya existe." });

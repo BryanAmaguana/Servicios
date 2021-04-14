@@ -20,7 +20,7 @@ app.get('/ObtenerPersonas/:desde/:limite', [verificaToken], (req, res) => {
 
 /* Agregar nueva persona */
 
-app.post('/AgregarPersona', [verificaToken], function (req, res) {
+app.post('/AgregarPersona', function (req, res) {
     const persona = new Persona();
 
     const { cedula_persona, nombre_persona, apellido_persona, direccion_persona, celular_persona, fecha_nacimiento_persona } = req.body;

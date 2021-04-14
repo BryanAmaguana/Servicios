@@ -10,7 +10,7 @@ app.get('/ObtenerTarjeta/:disponible/:desde/:limite', [verificaToken], (req, res
     let disponible = req.params.disponible;
     const desde = req.params.desde;
     const limite = req.params.limite;
-    Tarjeta.find({ disponible: disponible }).skip(Number(desde)).limit(Number(limite)).sort({ codigo: 1 }).exec((err, tarjeta) => {
+    Tarjeta.find({ disponible: disponible }).skip(Number(desde)).limit(Number(limite)).sort({ codigo: 1 }).populate('descripcion').exec((err, tarjeta) => {
         if (err) {
             return res.status(400).send({ message: "No se encontro ninguna tarjeta." });
         }
@@ -118,7 +118,7 @@ app.put('/ActualizarTarjeta/:id', [verificaToken], function (req, res) {
 app.get('/ObtenerTarjetaCodigo/:codigo/:disponible', [verificaToken], (req, res) => {
     let codigo = req.params.codigo;
     const disponible = req.params.disponible;
-    Tarjeta.find({ codigo: {'$regex': `${codigo}` , '$options': 'i'} }).find({disponible: disponible}).exec((err, tarjeta) => {
+    Tarjeta.find({ codigo: {'$regex': `${codigo}` , '$options': 'i'} }).find({disponible: disponible}).populate('descripcion').exec((err, tarjeta) => {
         if (err) {
             return res.status(400).send({ message: "No se encontro ninguna tarjeta." });
         }
@@ -130,7 +130,7 @@ app.get('/ObtenerTarjetaCodigo/:codigo/:disponible', [verificaToken], (req, res)
 
 app.get('/ObtenerTarjetaCodigoP/:codigo', [verificaToken], (req, res) => {
     let codigo = req.params.codigo;
-    Tarjeta.findOne({disponible: true, codigo: codigo}).then(tarjeta => {
+    Tarjeta.findOne({disponible: true, codigo: codigo}).populate('descripcion').then(tarjeta => {
         if (!tarjeta) {
             res.status(404).send({ message: "No se ha encontrado ninguna tarjeta." });
         } else {

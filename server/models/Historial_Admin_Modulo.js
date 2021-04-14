@@ -20,7 +20,8 @@ let Historial_adminSchema = new Schema({
     },
 
     id_usuario: {
-        type: String,
+        type: Schema.ObjectId,
+        ref: 'Usuario',
         required: [true, "id del usuario requerido"]
     },
 
