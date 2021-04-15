@@ -68,9 +68,24 @@ function BloquearTarjeta(codigo_tarjeta) {
         }
     });
 }
+/* Bloqueo de tarjeta */
 
 function RazonBloqueo(codigo_tarjeta, razon) {
     Tarjeta.updateOne({ codigo: codigo_tarjeta }, { bloqueo: razon }, (err, TarjetaActivado) => {
+        if (err) {
+            console.log(err);
+        } else {
+            if (!TarjetaActivado) {
+            } else {
+                return false;
+            }
+        }
+    });
+}
+
+/* Actualizacion de tarjeta */
+function ActualizarTarjeta(codigo_tarjeta, valor_tarjeta) {
+    Tarjeta.updateOne({ codigo: codigo_tarjeta }, { valor_tarjeta: valor_tarjeta }, (err, TarjetaActivado) => {
         if (err) {
             console.log(err);
         } else {
@@ -92,28 +107,44 @@ app.post('/AgregarCobro', function (req, res) {
     cobro.fecha_hora_cobro = f;
     cobro.valor_pagado = valor_pagado;
 
-    Tarjeta.find({codigo: codigo_tarjeta }).populate('descripcion').exec((err, tarjeta) => {
+    Tarjeta.find({ codigo: codigo_tarjeta }).populate('descripcion').exec((err, tarjeta) => {
         if (err) {
             res.json({
-                cobro: false
+                mesanje: false
             });
         } else {
-            if (tarjeta[0].disponible) {
-                if (valor_Tarjeta == tarjeta[0].valor_tarjeta && valor_pagado == tarjeta[0].descripcion.valor) {
-                    CobroAdd(cobro);
-                    res.json({
-                        cobro: true
-                    });
+            try {
+                if (tarjeta[0].disponible) {
+                    if (valor_Tarjeta == tarjeta[0].valor_tarjeta && valor_pagado == tarjeta[0].descripcion.valor) {
+                        if (valor_Tarjeta > valor_pagado) {
+                            CobroAdd(cobro);
+                            let Nvalor = 0;
+                            Nvalor = valor_Tarjeta - valor_pagado;
+                            ActualizarTarjeta(codigo_tarjeta, Nvalor.toFixed(2));
+                            res.json({
+                                mesanje: true
+                            });
+                        } else {
+                            res.json({
+                                mesanje: "Saldo Insuficiente"
+                            });
+                        }
+
+                    } else {
+                        BloquearTarjeta(codigo_tarjeta)
+                        RazonBloqueo(codigo_tarjeta, "Tarjeta Modificada")
+                        res.json({
+                            mesanje: false
+                        });
+                    }
                 } else {
-                    BloquearTarjeta(codigo_tarjeta)
-                    RazonBloqueo(codigo_tarjeta, "Tarjeta Modificada")
                     res.json({
-                        cobro: false
+                        mesanje: "Tarjeta Bloqueada"
                     });
                 }
-            } else {
+            } catch (error) {
                 res.json({
-                    cobro: "Tarjeta Bloqueada"
+                    mesanje: "Tarjeta no existe"
                 });
             }
         }

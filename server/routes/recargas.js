@@ -4,6 +4,7 @@ const Recargas = require('../models/Recargas_Modulo');
 const app = express();
 const moment = require('moment-timezone');
 const f = moment().tz("America/Guayaquil").format();
+const Tarjeta = require('../models/Tarjeta_Modulo');
 
 
 /* Obtener cobro pasaje filtrado */
@@ -37,24 +38,62 @@ app.get('/ObtenerRecargas/:inicio/:fin/:id_usuario', [verificaToken], (req, res)
 });
 
 
-/* Agregar un cobro */
+/* Actualizar Tarjeta */
 
-app.post('/AgregarRecarga', function (req, res) {
-    const cobro = new Cobro();
-    const { valor_recarga, codigo_tarjeta, nombre_usuario } = req.body;
-    cobro.fecha_hora_Accion = f;
-    cobro.valor_recarga = valor_recarga;
-    cobro.codigo_tarjeta = codigo_tarjeta;
-    cobro.nombre_usuario = nombre_usuario;
-
-    cobro.save((err, RecargaStored) => {
+function ActualizarTarjeta(codigo_tarjeta, valor_Total_recarga, valor_recarga, usuario) {
+    Tarjeta.updateOne({ codigo: codigo_tarjeta }, { valor_tarjeta: valor_Total_recarga }, (err, TarjetaActivado) => {
         if (err) {
-            res.status(500).send(err);
+            return "No se encontro tarjeta"
+        } else {
+            if (!TarjetaActivado) {
+            } else {
+                AddRecarga(codigo_tarjeta,valor_recarga, usuario);
+                return false;
+            }
+        }
+    });
+}
+
+function AddRecarga(codigo_tarjeta, valor_recarga, nombre_usuario) {
+    const recargas = new Recargas();
+    recargas.fecha_hora_Accion = f;
+    recargas.valor_recarga = valor_recarga;
+    recargas.codigo_tarjeta = codigo_tarjeta;
+    recargas.nombre_usuario = nombre_usuario;
+    recargas.save((err, RecargaStored) => {
+        if (err) {
+            return false
         } else {
             if (!RecargaStored) {
-                res.status(404).send(false);
-            } else {
-                res.status(200).send(true);
+                return false
+            }
+        }
+    });
+}
+
+/* Agregar una recarga */
+
+app.post('/AgregarRecarga', function (req, res) {
+    const { valor_recarga, codigo_tarjeta, nombre_usuario } = req.body;
+
+
+    Tarjeta.find({ codigo: codigo_tarjeta }).exec((err, tarjeta) => {
+        if (err) {
+            res.json({
+                mesanje: "Tarjeta no existe"
+            });
+        } else {
+            try {
+                let Nvalor = 0;
+                Nvalor = parseFloat(tarjeta[0].valor_tarjeta) + parseFloat(valor_recarga);
+                ActualizarTarjeta(codigo_tarjeta, Nvalor.toFixed(2), valor_recarga, nombre_usuario);
+                res.json({
+                    mesanje: "Recarga exitosa"
+                });
+            } catch (error) {
+                res.json({
+                    mesanje: "Tarjeta no existe"
+                });
             }
         }
     });

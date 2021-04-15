@@ -11,17 +11,17 @@ let RecargasSchema = new Schema({
 
     valor_recarga: {
         type: Number,
-        required: false
+        required: [true, "valor de la recarga requerido"]
     },
 
     codigo_tarjeta: {
         type: String,
-        required: false
+        required: [true, "codigo de la tarjeta requerido"]
     },
 
     nombre_usuario: {
         type: String,
-        required: [true, "id del usuario requerido"]
+        required: [true, "nombre del usuario requerido"]
     },
 
 });
