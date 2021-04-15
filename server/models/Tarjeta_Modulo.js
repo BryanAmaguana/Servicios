@@ -29,7 +29,7 @@ let TarjetaSchema = new Schema({
 
     bloqueo: {
         type: String,
-        required: [true, "Tipo de pasajero obligatorio"]
+        required: false
     }
 });
 

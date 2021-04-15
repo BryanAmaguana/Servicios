@@ -9,7 +9,7 @@ const app = express();
 let AgregarHistorial = (id_usuario, accion_admin, descripcion) => {
     const Historial = new Historial_admin();
     var f = new Date();
-    Historial.fecha_accion = (f.getDate() + "/" + (f.getMonth() +1) + "/" + f.getFullYear()+"/" + f.getHours()+ ":"+ f.getMinutes()+":"+ f.getSeconds());;
+    Historial.fecha_accion = f;
     Historial.accion_admin = accion_admin;
     Historial.id_usuario = id_usuario;
     Historial.descripcion = descripcion;
