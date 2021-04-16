@@ -4,6 +4,18 @@ const Tarjeta = require('../models/Tarjeta_Modulo');
 const app = express();
 const { AgregarHistorial } = require('../routes/historial_admin');
 
+
+app.get('/Tarjeta', (req, res) => {
+    Tarjeta.find({}).exec((err, tarjeta) => {
+        if (err) {
+            return res.status(400).send({ message: "No se encontro ninguna tarjeta." });
+        }
+        res.json({
+            tarjeta: tarjeta
+        });
+    });
+});
+
 /* Obtener tarjetas Activas y desactivadas */
 
 app.get('/ObtenerTarjeta/:disponible/:desde/:limite', [verificaToken], (req, res) => {
@@ -31,6 +43,45 @@ app.post('/AgregarTarjeta', [verificaToken], function (req, res) {
     tarjeta.disponible = true;
     tarjeta.descripcion = descripcion;
     tarjeta.bloqueo = ""
+
+    tarjeta.save((err, TarjetaStored) => {
+        if (err) {
+            res.status(500).send({ message: "La tarjeta ya existe." });
+        } else {
+            if (!TarjetaStored) {
+                res.status(404).send({ message: "Error al crear la tarjeta." });
+            } else {
+                res.status(200).send({ message: "Tarjeta creada exitosamente." });
+            }
+        }
+    });
+});
+
+
+/* Agregar una tarjeta Inicializar*/
+
+app.get('/InicializarTarjeta/:codigo/:valor_tarjeta/:descripcion', function (req, res) {
+    const tarjeta = new Tarjeta();
+
+    const codigo = req.params.codigo;
+    const valor_tarjeta = req.params.valor_tarjeta;
+    const descripcion = req.params.descripcion;
+
+    tarjeta.codigo = codigo;
+    tarjeta.valor_tarjeta = valor_tarjeta;
+    tarjeta.disponible = true;
+    tarjeta.bloqueo = ""
+
+    if (descripcion == 1) {
+        /* Adulto */
+        tarjeta.descripcion = "604e6c86e20cbe0f62d9d35d";
+    } else if (descripcion == 2) {
+        /* Estudiante */
+        tarjeta.descripcion = "604e6c71e20cbe0f62d9d35c";
+    } else if (descripcion == 3) {
+        /* tercera edad */
+        tarjeta.descripcion = "604e6c95e20cbe0f62d9d35e";
+    }
 
     tarjeta.save((err, TarjetaStored) => {
         if (err) {
@@ -87,7 +138,7 @@ app.delete('/BorrarTarjeta/:id', [verificaToken], function (req, res) {
                 res
                     .status(200)
                     .send({ message: "La tarjeta ha sido eliminada correctamente." });
-                    AgregarHistorial(usuario.id,"Borro la tarjeta: "+id);
+                AgregarHistorial(usuario.id, "Borro la tarjeta: " + id);
             }
         }
     });
@@ -119,7 +170,7 @@ app.put('/ActualizarTarjeta/:id', [verificaToken], function (req, res) {
 app.get('/ObtenerTarjetaCodigo/:codigo/:disponible', [verificaToken], (req, res) => {
     let codigo = req.params.codigo;
     const disponible = req.params.disponible;
-    Tarjeta.find({ codigo: {'$regex': `${codigo}` , '$options': 'i'} }).find({disponible: disponible}).populate('descripcion').exec((err, tarjeta) => {
+    Tarjeta.find({ codigo: { '$regex': `${codigo}`, '$options': 'i' } }).find({ disponible: disponible }).populate('descripcion').exec((err, tarjeta) => {
         if (err) {
             return res.status(400).send({ message: "No se encontro ninguna tarjeta." });
         }
@@ -131,7 +182,7 @@ app.get('/ObtenerTarjetaCodigo/:codigo/:disponible', [verificaToken], (req, res)
 
 app.get('/ObtenerTarjetaCodigoP/:codigo', [verificaToken], (req, res) => {
     let codigo = req.params.codigo;
-    Tarjeta.findOne({disponible: true, codigo: codigo}).populate('descripcion').then(tarjeta => {
+    Tarjeta.findOne({ disponible: true, codigo: codigo }).populate('descripcion').then(tarjeta => {
         if (!tarjeta) {
             res.status(404).send({ message: "No se ha encontrado ninguna tarjeta." });
         } else {

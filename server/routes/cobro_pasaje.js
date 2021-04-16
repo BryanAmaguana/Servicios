@@ -5,14 +5,26 @@ const app = express();
 const Tarjeta = require('../models/Tarjeta_Modulo');
 const moment = require('moment-timezone');
 const f = moment().tz("America/Guayaquil").format();
+var ISODate = require("isodate");
 
+/* Obtener todo */
+app.get('/Cobro', (req, res) => {
+    Cobro.find({}).exec((err, cobro) => {
+        if (!cobro) {
+            return res.status(400).send({ message: "No se encontro ningun cobro." });
+        }
+        res.json({
+            cobro: cobro
+        });
+    });
+});
 
 /* Obtener cobro pasaje sin filtrado */
 app.get('/ObtenerCobroPasajeTodo/:inicio/:fin', [verificaToken], (req, res) => {
     let desde = req.params.inicio;
     let limite = req.params.fin;
 
-    Cobro.find({}).skip(Number(desde)).limit(Number(limite)).populate('id_tarjeta').populate('id_bus_cobro').exec((err, cobro) => {
+    Cobro.find({}).skip(Number(desde)).limit(Number(limite)).exec((err, cobro) => {
         if (!cobro) {
             return res.status(400).send({ message: "No se encontro ningun cobro." });
         }
@@ -23,12 +35,12 @@ app.get('/ObtenerCobroPasajeTodo/:inicio/:fin', [verificaToken], (req, res) => {
 });
 
 /* Obtener cobro pasaje filtrado */
-app.get('/ObtenerCobroPasaje/:inicio/:fin/:bus', [verificaToken], (req, res) => {
+app.get('/ObtenerCobroPasaje/:inicio/:fin/:bus',/*  [verificaToken], */ (req, res) => {
     let inicio = req.params.inicio;
     let fin = req.params.fin;
     let bus = req.params.bus;
-
-    Cobro.find({ numero_bus_cobro: bus }).find({ fecha_hora_cobro: { $gte: inicio, $lte: fin } }).populate('id_tarjeta').populate('id_bus_cobro').exec((err, cobro) => {
+    
+    Cobro.find({ numero_bus_cobro: bus }).find({ fecha_hora_cobro: { $gte:  inicio+'T00:00:00.000+00:00', $lte: fin+'T23:59:59.000+00:00' } }).populate('id_tarjeta').populate('id_bus_cobro').exec((err, cobro) => {
         if (err) {
             return res.status(400).send({ message: "No se encontro ningun cobro." });
         }
@@ -99,12 +111,16 @@ function ActualizarTarjeta(codigo_tarjeta, valor_tarjeta) {
 
 /* Agregar un cobro */
 
-app.post('/AgregarCobro', function (req, res) {
+app.get('/AgregarCobro/:codigo_tarjeta/:valor_Tarjeta/:numero_bus_cobro/:valor_pagado', function (req, res) {
     const cobro = new Cobro();
-    const { codigo_tarjeta, valor_Tarjeta, numero_bus_cobro, valor_pagado } = req.body;
+    const valor_Tarjeta = req.params.valor_Tarjeta;
+    const codigo_tarjeta = req.params.codigo_tarjeta;
+    const numero_bus_cobro = req.params.numero_bus_cobro;
+    const valor_pagado = req.params.valor_pagado;
+
     cobro.codigo_tarjeta = codigo_tarjeta;
     cobro.numero_bus_cobro = numero_bus_cobro;
-    cobro.fecha_hora_cobro = f;
+    cobro.fecha_hora_cobro = ISODate(f);
     cobro.valor_pagado = valor_pagado;
 
     Tarjeta.find({ codigo: codigo_tarjeta }).populate('descripcion').exec((err, tarjeta) => {

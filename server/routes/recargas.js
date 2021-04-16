@@ -6,12 +6,8 @@ const moment = require('moment-timezone');
 const f = moment().tz("America/Guayaquil").format();
 const Tarjeta = require('../models/Tarjeta_Modulo');
 
-
-/* Obtener cobro pasaje filtrado */
-app.get('/ObtenerRecarga/:desde/:limite', [verificaToken], (req, res) => {
-    const desde = req.params.desde;
-    const limite = req.params.limite;
-    Recarga.find({}).skip(Number(desde)).limit(Number(limite)).sort({ cedula_persona: 1 }).populate('id_usuario').populate('id_tarjeta_recargada').exec((err, recarga) => {
+app.get('/Recarga',  (req, res) => {
+    Recargas.find({}).exec((err, recarga) => {
         if (err) {
             return res.status(400).send({ message: "No se encontro ninguna recarga." });
         }
@@ -22,12 +18,26 @@ app.get('/ObtenerRecarga/:desde/:limite', [verificaToken], (req, res) => {
 });
 
 /* Obtener cobro pasaje filtrado */
-app.get('/ObtenerRecargas/:inicio/:fin/:id_usuario', [verificaToken], (req, res) => {
+app.get('/ObtenerRecarga/:desde/:limite', [verificaToken],  (req, res) => {
+    const desde = req.params.desde;
+    const limite = req.params.limite;
+    Recargas.find({}).skip(Number(desde)).limit(Number(limite)).sort({ fecha_hora_Accion: 1 }).exec((err, recarga) => {
+        if (err) {
+            return res.status(400).send({ message: "No se encontro ninguna recarga." });
+        }
+        res.json({
+            recarga: recarga
+        });
+    });
+});
+
+/* Obtener cobro pasaje filtrado */
+app.get('/ObtenerRecargaFiltrado/:inicio/:fin/:nombre_usuario', [verificaToken], (req, res) => {
     let inicio = req.params.inicio;
     let fin = req.params.fin;
-    let id_usuario = req.params.id_usuario;
+    let nombre_usuario = req.params.nombre_usuario;
 
-    Recargas.find({ id_usuario: id_usuario }).find({ fecha_hora_Accion: { $gte: inicio, $lte: fin } }).populate('id_usuario').populate('id_tarjeta_recargada').exec((err, recarga) => {
+    Recargas.find({ nombre_usuario: nombre_usuario }).find({ fecha_hora_Accion: { $gte: inicio+'T00:00:00.000+00:00', $lte: fin+'T23:59:59.000+00:00' } }).exec((err, recarga) => {
         if (err) {
             return res.status(400).send({ message: "No se encontro ninguna recarga." });
         }
@@ -73,8 +83,11 @@ function AddRecarga(codigo_tarjeta, valor_recarga, nombre_usuario) {
 
 /* Agregar una recarga */
 
-app.post('/AgregarRecarga', function (req, res) {
-    const { valor_recarga, codigo_tarjeta, nombre_usuario } = req.body;
+app.get('/AgregarRecarga/:valor_recarga/:codigo_tarjeta/:nombre_usuario', function (req, res) {
+
+    const valor_recarga = req.params.valor_recarga;
+    const codigo_tarjeta = req.params.codigo_tarjeta;
+    const nombre_usuario = req.params.nombre_usuario;
 
 
     Tarjeta.find({ codigo: codigo_tarjeta }).exec((err, tarjeta) => {
