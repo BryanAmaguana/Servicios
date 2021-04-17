@@ -138,7 +138,7 @@ app.get('/AgregarCobro/:codigo_tarjeta/:valor_Tarjeta/:numero_bus_cobro/:valor_p
                             Nvalor = valor_Tarjeta - valor_pagado;
                             ActualizarTarjeta(codigo_tarjeta, Nvalor.toFixed(2));
                             res.json({
-                                mesanje: true
+                                mesanje: "Cobro ingresado Exitosamente"
                             });
                         } else {
                             res.json({
