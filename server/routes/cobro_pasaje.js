@@ -1,20 +1,54 @@
 const express = require('express');
 const Cobro = require('../models/Cobro_Pasaje_Modulo');
-const { verificaToken, verificarRol } = require('../middlewares/autenticacion');
+const { verificaToken } = require('../middlewares/autenticacion');
 const app = express();
 const Tarjeta = require('../models/Tarjeta_Modulo');
 const moment = require('moment-timezone');
 const f = moment().tz("America/Guayaquil").format();
 var ISODate = require("isodate");
 
-/* Obtener todo */
-app.get('/Cobro', (req, res) => {
-    Cobro.find({}).exec((err, cobro) => {
+
+/* Obtener todo pasaje por meses */
+
+
+function ResolverRepetidos(lista) {
+    const buses = [];
+    const busesTemp = [];
+    const ListTemp = [];
+
+    var Total = 0;
+    for (let i = 0; i < lista.length; i) {
+        ListTemp.push(lista[i]);
+        busesTemp.push(lista[i]);
+        lista.splice(i, 1);
+        for (let q = 0; q < lista.length; q++) {
+            if (parseFloat(ListTemp[0].numero_bus_cobro) === parseFloat(lista[q].numero_bus_cobro)) {
+                busesTemp.push(lista[q]);
+                lista.splice(q, 1);
+                q=q-1;
+            }
+        }
+        for(let x = 0; x < busesTemp.length; x++){
+            Total += busesTemp[x].valor_pagado
+        }
+        buses.push({Numero_bus: ListTemp[0].numero_bus_cobro, total: Total})
+        ListTemp.splice(0)
+        busesTemp.splice(0)
+        Total = 0;
+    }
+    return buses;
+}
+
+app.get('/CobroMeses/:inicio/:fin', (req, res) => {
+    let inicio = req.params.inicio;
+    let fin = req.params.fin;
+    
+    Cobro.find({ fecha_hora_cobro: { $gte: inicio+'T00:00:00.000+00:00', $lte: fin+'T23:59:59.000+00:00' } }).exec((err, cobro) => {
         if (!cobro) {
             return res.status(400).send({ message: "No se encontro ningun cobro." });
         }
         res.json({
-            cobro: cobro
+            cobro:  ResolverRepetidos(cobro)
         });
     });
 });
