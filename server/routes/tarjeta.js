@@ -124,12 +124,11 @@ app.put('/ActivarTarjeta/:id', [verificaToken], function activateTarjeta(req, re
 
 /* Eliminar una Tarjeta */
 
-app.delete('/BorrarTarjeta/:id', [verificaToken], function (req, res) {
+app.get('/BorrarTarjeta/:id', function (req, res) {
     const { id } = req.params;
-    let usuario = req.user;
-
-    Tarjeta.findByIdAndRemove(id, (err, TarjetaDeleted) => {
+    Tarjeta.findOneAndDelete(id, (err, TarjetaDeleted) => {
         if (err) {
+            console.log(err);
             res.status(500).send({ message: "Error del servidor." });
         } else {
             if (!TarjetaDeleted) {
@@ -138,7 +137,6 @@ app.delete('/BorrarTarjeta/:id', [verificaToken], function (req, res) {
                 res
                     .status(200)
                     .send({ message: "La tarjeta ha sido eliminada correctamente." });
-                AgregarHistorial(usuario.id, "Borro la tarjeta: " + id);
             }
         }
     });
