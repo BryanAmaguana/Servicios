@@ -53,6 +53,17 @@ app.get('/CobroMeses/:inicio/:fin', (req, res) => {
     });
 });
 
+app.get('/Cobro', (req, res) => {
+    Cobro.find({  }).exec((err, cobro) => {
+        if (!cobro) {
+            return res.status(400).send({ message: "No se encontro ningun cobro." });
+        }
+        res.json({
+            cobro:  ResolverRepetidos(cobro)
+        });
+    });
+});
+
 /* Obtener cobro pasaje sin filtrado */
 app.get('/ObtenerCobroPasajeTodo/:inicio/:fin', [verificaToken], (req, res) => {
     let desde = req.params.inicio;
