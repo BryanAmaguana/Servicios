@@ -150,7 +150,7 @@ app.get('/BuscarBusNumero/:numero_bus/:disponible', [verificaToken], (req, res) 
     try {
         const numero_bus = req.params.numero_bus;
         const disponible = req.params.disponible;
-        Bus.findOne({ numero_bus: numero_bus, disponible: disponible }).populate('id_persona').exec((err, bus) => {
+        Bus.find({ numero_bus: numero_bus, disponible: disponible }).populate('id_persona').exec((err, bus) => {
             if (!bus) {
                 return res.status(400).send({ message: "No se encontro ningun Bus." });
             }
