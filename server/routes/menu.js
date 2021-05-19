@@ -5,8 +5,9 @@ const { verificaToken, verificarRol } = require('../middlewares/autenticacion');
 
 /* Agregar menu */
 app.post('/AddMenu', [verificaToken, verificarRol], function (req, res) {
+  try {
     const menu = new Menu();
-    
+
     const { titulo, url, order, disponible } = req.body;
     menu.titulo = titulo;
     menu.url = url;
@@ -14,20 +15,26 @@ app.post('/AddMenu', [verificaToken, verificarRol], function (req, res) {
     menu.disponible = disponible;
 
     menu.save((err, createdMenu) => {
-        if (err) {
-            res.status(500).send({ message: "Error del servidor." });
+      if (err) {
+        res.status(500).send({ message: "Error del servidor." });
+      } else {
+        if (!createdMenu) {
+          res.status(404).send({ message: "Error al crear el Menu." });
         } else {
-            if (!createdMenu) {
-                res.status(404).send({ message: "Error al crear el Menu." });
-            } else {
-                res.status(200).send({ message: "Menu creado correctamente." });
-            }
+          res.status(200).send({ message: "Menu creado correctamente." });
         }
+      }
     });
+  } catch (error) {
+    console.log("Error: AddMuenu");
+    console.log(error);
+  }
+
 });
 
 
 app.get('/ObtenerMenu', function (req, res) {
+  try {
     Menu.find().sort({ order: "asc" }).exec((err, menusStored) => {
       if (err) {
         res.status(500).send({ message: "Error del servidor." });
@@ -41,13 +48,19 @@ app.get('/ObtenerMenu', function (req, res) {
         }
       }
     });
+  } catch (error) {
+    console.log("Error: ObtenerMenu");
+    console.log(error);
+  }
+
 });
 
 
 app.put('/ActualizarMenu/:id', [verificaToken, verificarRol], function (req, res) {
+  try {
     let menuData = req.body;
     const params = req.params;
-  
+
     Menu.findByIdAndUpdate(params.id, menuData, (err, menuUpdate) => {
       if (err) {
         res.status(500).send({ message: "Error del servidor." });
@@ -59,13 +72,18 @@ app.put('/ActualizarMenu/:id', [verificaToken, verificarRol], function (req, res
         }
       }
     });
+  } catch (error) {
+    console.log("Error: ActualizarMenu");
+    console.log(error);
+  }
 });
 
 app.put('/ActivarMenu/:id', [verificaToken], function (req, res) {
+  try {
 
     const { id } = req.params;
     const { disponible } = req.body;
-  
+
     Menu.findByIdAndUpdate(id, { disponible }, (err, menuStored) => {
       if (err) {
         res.status(500).send({ message: "Erro del servidor." });
@@ -81,12 +99,17 @@ app.put('/ActivarMenu/:id', [verificaToken], function (req, res) {
         }
       }
     });
+  } catch (error) {
+    console.log("Error: ActivarMenu");
+    console.log(error);
+  }
+
 });
 
 
 app.delete('/BorrarMenu/:id', [verificaToken, verificarRol], function (req, res) {
+  try {
     const { id } = req.params;
-
     Menu.findByIdAndRemove(id, (err, menuDeleted) => {
       if (err) {
         res.status(500).send({ message: "Error del servidor." });
@@ -100,6 +123,10 @@ app.delete('/BorrarMenu/:id', [verificaToken, verificarRol], function (req, res)
         }
       }
     });
+  } catch (error) {
+    console.log("Error: BorrarMenu");
+    console.log(error);
+  }
 });
 
 

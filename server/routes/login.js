@@ -1,21 +1,21 @@
-const express = require('express');
-const bcrypt = require('bcrypt');
-const Usuario = require('../models/Usuario_Modulo');
+const express = require("express");
+const bcrypt = require("bcrypt");
+const Usuario = require("../models/Usuario_Modulo");
 const app = express();
-const jwt = require('../middlewares/jwt');
-const { AgregarHistorial } = require('../routes/historial_admin');
+const jwt = require("../middlewares/jwt");
 
-app.post('/login',  (req, res) =>  {
+app.post("/login", (req, res) => {
+  try {
     const params = req.body;
     const nombre_usuario = params.nombre_usuario;
     const contrasena = params.contrasena;
-  
-    Usuario.findOne({nombre_usuario}, (err, userStored) => {
+
+    Usuario.findOne({ nombre_usuario }, (err, userStored) => {
       if (err) {
-        res.status(500).send({ message: "Error del servidor." });;
+        res.status(500).send({ message: "Error del servidor." });
       } else {
         if (!userStored) {
-          res.status(404).send( { message: "Usuario no encontrado." });
+          res.status(404).send({ message: "Usuario no encontrado." });
         } else {
           bcrypt.compare(contrasena, userStored.contrasena, (err, check) => {
             if (err) {
@@ -30,7 +30,7 @@ app.post('/login',  (req, res) =>  {
               } else {
                 res.status(200).send({
                   accessToken: jwt.createAccessToken(userStored),
-                  refreshToken: jwt.createRefreshToken(userStored)
+                  refreshToken: jwt.createRefreshToken(userStored),
                 });
               }
             }
@@ -38,6 +38,11 @@ app.post('/login',  (req, res) =>  {
         }
       }
     });
-  });
+  } catch (error) {
+    console.log("Error: login")
+    console.log(error)
+  }
+
+});
 
 module.exports = app;
