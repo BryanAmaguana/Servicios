@@ -249,7 +249,7 @@ app.get('/AgregarCobro/:codigo_tarjeta/:valor_Tarjeta/:numero_bus_cobro/:valor_p
         Tarjeta.find({ codigo: codigo_tarjeta }).populate('descripcion').exec((err, tarjeta) => {
             if (err) {
                 res.json({
-                    mesanje: "Tarjeta no identificada"
+                    "Tarjeta no identificada"
                 });
             } else {
                 try {
@@ -261,11 +261,11 @@ app.get('/AgregarCobro/:codigo_tarjeta/:valor_Tarjeta/:numero_bus_cobro/:valor_p
                                 Nvalor = valor_Tarjeta - valor_pagado;
                                 ActualizarTarjeta(codigo_tarjeta, Nvalor.toFixed(2));
                                 res.json({
-                                    mesanje: "Cobro ingresado Exitosamente"
+                                    "Cobro ingresado Exitosamente"
                                 });
                             } else {
                                 res.json({
-                                    mesanje: "Saldo Insuficiente"
+                                    "Saldo Insuficiente"
                                 });
                             }
 
@@ -273,17 +273,17 @@ app.get('/AgregarCobro/:codigo_tarjeta/:valor_Tarjeta/:numero_bus_cobro/:valor_p
                             BloquearTarjeta(codigo_tarjeta)
                             RazonBloqueo(codigo_tarjeta, "Tarjeta Modificada")
                             res.json({
-                                mesanje: false
+                                "Vuelva a intentar"
                             });
                         }
                     } else {
                         res.json({
-                            mesanje: "Tarjeta Bloqueada"
+                            "Tarjeta Bloqueada"
                         });
                     }
                 } catch (error) {
                     res.json({
-                        mesanje: "Tarjeta no existe"
+                        "Tarjeta no existe"
                     });
                 }
             }
