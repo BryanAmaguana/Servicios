@@ -271,7 +271,7 @@ app.get('/AgregarCobro/:codigo_tarjeta/:valor_Tarjeta/:numero_bus_cobro/:valor_p
 
                         } else {
                             BloquearTarjeta(codigo_tarjeta)
-                            RazonBloqueo(codigo_tarjeta, "Tarjeta Modificada")
+                            RazonBloqueo(codigo_tarjeta, "Tarjeta Modificada, Valor de la Tarjeta: " + valor_Tarjeta )
                             res.json({
                                 error: "Vuelva a intentar"
                             });
