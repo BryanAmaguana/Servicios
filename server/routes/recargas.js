@@ -206,7 +206,7 @@ app.get('/AgregarRecarga/:valor_recarga/:codigo_tarjeta/:nombre_usuario', functi
         Tarjeta.find({ codigo: codigo_tarjeta }, {disponible:true}).exec((err, tarjeta) => {
             if (err) {
                 res.json({
-                    error: "Tarjeta no existe"
+                    error: "Tarjeta bloqueada o no registrada"
                 });
             } else {
                 try {
