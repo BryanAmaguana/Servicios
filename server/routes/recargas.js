@@ -206,7 +206,7 @@ app.get('/AgregarRecarga/:valor_recarga/:codigo_tarjeta/:nombre_usuario', functi
         Tarjeta.find({ codigo: codigo_tarjeta }).exec((err, tarjeta) => {
             if (err) {
                 res.json({
-                    mesanje: "Tarjeta no existe"
+                    error: "Tarjeta no existe"
                 });
             } else {
                 try {
@@ -214,11 +214,11 @@ app.get('/AgregarRecarga/:valor_recarga/:codigo_tarjeta/:nombre_usuario', functi
                     Nvalor = parseFloat(tarjeta[0].valor_tarjeta) + parseFloat(valor_recarga);
                     ActualizarTarjeta(codigo_tarjeta, Nvalor.toFixed(2), valor_recarga, nombre_usuario);
                     res.json({
-                        mesanje: "Recarga exitosa"
+                        ok: "Recarga exitosa"
                     });
                 } catch (error) {
                     res.json({
-                        mesanje: "Tarjeta no existe"
+                        error: "Tarjeta no existe"
                     });
                 }
             }
