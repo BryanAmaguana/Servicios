@@ -108,7 +108,6 @@ app.get("/InicializarTarjeta/:codigo/:valor_tarjeta/:descripcion", function (req
 
     tarjeta.save((err, TarjetaStored) => {
       if (err) {
-    
                 res.status(500).send({ error: "La tarjeta ya existe." });
   
       } else {
