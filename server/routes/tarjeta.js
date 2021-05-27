@@ -65,12 +65,12 @@ app.post("/AgregarTarjeta", [verificaToken], function (req, res) {
     tarjeta.bloqueo = "";
     tarjeta.save((err, TarjetaStored) => {
       if (err) {
-        res.status(500).send({ message: "La tarjeta ya existe." });
+        res.status(500).send({ error: "La tarjeta ya existe." });
       } else {
         if (!TarjetaStored) {
-          res.status(404).send({ message: "Error al crear la tarjeta." });
+          res.status(404).send({ error: "Error al crear la tarjeta." });
         } else {
-          res.status(200).send({ message: "Tarjeta creada exitosamente." });
+          res.status(200).send({ok: "Tarjeta creada exitosamente." });
         }
       }
     });
@@ -108,30 +108,12 @@ app.get("/InicializarTarjeta/:codigo/:valor_tarjeta/:descripcion", function (req
 
     tarjeta.save((err, TarjetaStored) => {
       if (err) {
-         Tarjeta.findByIdAndUpdate(
-          { codigo: codigo },
-          TarjetaStored,
-          (err, TarjetaUpdate) => {
-            if (err) {
-              res.status(500).send({ message: "Datos Duplicados." });
-            } else {
-              if (!TarjetaUpdate) {
-                res
-                  .status(404)
-                  .send({ message: "No se ha encontrado ninguna Tarjeta." });
-              } else {
-                res
-                  .status(200)
-                  .send({ message: "Tarjeta actualizada correctamente." });
-              }
-            }
-          }
-        );
+  res.status(500).send({ error: "La tarjeta ya existe." });
       } else {
         if (!TarjetaStored) {
-          res.status(404).send({ message: "Error al crear la tarjeta." });
+          res.status(404).send({ error: "Error al crear la tarjeta." });
         } else {
-          res.status(200).send({ message: "Tarjeta creada exitosamente." });
+          res.status(200).send({ ok: "Tarjeta creada exitosamente." });
         }
       }
     });
