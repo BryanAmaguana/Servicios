@@ -108,16 +108,9 @@ app.get("/InicializarTarjeta/:codigo/:valor_tarjeta/:descripcion", function (req
 
     tarjeta.save((err, TarjetaStored) => {
       if (err) {
-  Tarjeta.updateOne({ codigo: codigo },{ disponible: true },{valor_tarjeta: 1}, {bloqueo: ""}, (err, TarjetaStored) => {
-            if (err) {
-                es.status(404).send({ error: "Error al Inicializar la tarjeta." });
-            } else {
-                if (!TarjetaStored) {
-                } else {
-                    return false;
-                }
-            }
-        });
+    
+                res.status(500).send({ error: "La tarjeta ya existe." });
+  
       } else {
         if (!TarjetaStored) {
           res.status(404).send({ error: "Error al crear la tarjeta." });
