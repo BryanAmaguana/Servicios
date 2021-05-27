@@ -203,7 +203,7 @@ app.get('/AgregarRecarga/:valor_recarga/:codigo_tarjeta/:nombre_usuario', functi
         const codigo_tarjeta = req.params.codigo_tarjeta;
         const nombre_usuario = req.params.nombre_usuario;
 
-        Tarjeta.find({ codigo: codigo_tarjeta }, {disponible:true}).exec((err, tarjeta) => {
+        Tarjeta.find({ codigo: codigo_tarjeta }).exec((err, tarjeta) => {
             if (err) {
                 res.json({
                     error: "Tarjeta bloqueada o no registrada"
