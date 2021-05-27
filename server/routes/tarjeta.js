@@ -112,7 +112,7 @@ app.get("/InicializarTarjeta/:codigo/:valor_tarjeta/:descripcion", function (req
             if (err) {
                 es.status(404).send({ error: "Error al Inicializar la tarjeta." });
             } else {
-                if (!TarjetaActivado) {
+                if (!TarjetaStored) {
                 } else {
                     return false;
                 }
