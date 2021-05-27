@@ -109,6 +109,25 @@ app.get("/InicializarTarjeta/:codigo/:valor_tarjeta/:descripcion", function (req
     tarjeta.save((err, TarjetaStored) => {
       if (err) {
         res.status(500).send({ message: "La tarjeta ya existe." });
+         Tarjeta.findByIdAndUpdate(
+          { codigo: codigo },
+          TarjetaStored,
+          (err, TarjetaUpdate) => {
+            if (err) {
+              res.status(500).send({ message: "Datos Duplicados." });
+            } else {
+              if (!TarjetaUpdate) {
+                res
+                  .status(404)
+                  .send({ message: "No se ha encontrado ninguna Tarjeta." });
+              } else {
+                res
+                  .status(200)
+                  .send({ message: "Tarjeta actualizada correctamente." });
+              }
+            }
+          }
+        );
       } else {
         if (!TarjetaStored) {
           res.status(404).send({ message: "Error al crear la tarjeta." });
