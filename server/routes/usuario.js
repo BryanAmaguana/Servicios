@@ -74,6 +74,26 @@ app.get('/ObtenerUsuarioNombreActivo/:nombre_usuario', [verificaToken], (req, re
 
 });
 
+app.get('/ObtenerUsuarioNombreUsuario/:nombre_usuario', [verificaToken], (req, res) => {
+    try {
+        let nombre_usuario = req.params.nombre_usuario;
+        Usuario.find({ nombre_usuario: { '$regex': `${nombre_usuario}`, '$options': 'i' } }).populate('id_persona').populate('id_rol').exec((err, usuario) => {
+            if (err) {
+                return res.status(400).send({ message: "No se encontro ningun usuario." });
+            }
+            res.json({
+                usuario
+            });
+        });
+
+    } catch (error) {
+        console.log("Error: ObtenerUsuarioNombreUsuario");
+        console.log(error);
+
+    }
+
+});
+
 /* Obtener Usuario por el nombre Inactivos*/
 
 app.get('/ObtenerUsuarioNombreInactivo/:nombre_usuario', [verificaToken], (req, res) => {
@@ -120,6 +140,8 @@ app.get('/ObtenerUsuarioActivos/:disponible/:desde/:limite', [verificaToken], (r
 
 
 });
+
+
 
 /* Obtener cantidad de Usuarios */
 
